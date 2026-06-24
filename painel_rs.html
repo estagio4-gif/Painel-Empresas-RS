@@ -209,6 +209,21 @@
         </div>
       </div>
 
+      <div class="fgroup">
+        <div class="fgtitle">Lei do Bem — potencial de PD&amp;I</div>
+        <p class="fhelp">Estimativa de empresas que <b>poderiam</b> usar a Lei do Bem (Lei 11.196/2005). Combine com <i>Regime tributário = Normal</i>, porte e capital para refinar o proxy de Lucro Real. O cruzamento com a lista de <b>beneficiárias do MCTI</b> (quem já usa) e com o <b>INPI</b> (quem inova) entra depois de rodar <code>montar_flags_leidobem.py</code>.</p>
+        <div class="row">
+          <div class="fld"><label>Intensidade de P&amp;D (CNAE)<span class="hint" title="Setores intensivos em P&amp;D pela classificação OCDE/Eurostat ajustada ao Brasil (ver cnae_pd_intensivo.csv)">ⓘ</span></label><select id="fPD"><option value="">(indiferente)</option><option value="alta">Alta intensidade</option><option value="media">Alta ou média</option></select></div>
+          <div class="fld"><label>Potencial Lei do Bem<span class="hint" title="Heurística: Ativa + regime Normal (não Simples/MEI) + CNAE intensivo em P&amp;D (alta ou média)">ⓘ</span></label><select id="fLB"><option value="">(indiferente)</option><option value="sim">Provável elegível (heurística)</option></select></div>
+        </div>
+        <div class="row" id="enrichedFilters" style="display:none;margin-top:10px">
+          <div class="fld"><label>Já usa Lei do Bem (MCTI)<span class="hint" title="Cruzamento com a lista de beneficiárias publicada pelo MCTI">ⓘ</span></label><select id="fJaUsa"><option value="">(indiferente)</option><option value="sim">Somente que JÁ usa</option><option value="nao">Somente que NÃO usa</option></select></div>
+          <div class="fld"><label>Sinal de inovação (INPI/FINEP)<span class="hint" title="Patente, registro de software ou fomento à inovação">ⓘ</span></label><select id="fInova"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld"><label>Score mínimo (Lei do Bem)<span class="hint" title="Score de aderência 0–100 calculado por montar_flags_leidobem.py">ⓘ</span></label><select id="fScore"><option value="">(qualquer)</option><option value="40">≥ 40</option><option value="60">≥ 60</option><option value="80">≥ 80</option></select></div>
+        </div>
+        <p class="fhelp" id="enrichedHint" style="display:none;margin-top:8px">✔ Base enriquecida detectada — filtros de beneficiárias (MCTI), inovação (INPI) e <i>score</i> ativos, e a coluna <b>Score LdB</b> aparece na tabela.</p>
+      </div>
+
       <div class="row" style="margin-top:4px">
         <button class="btn" id="btnFiltrar">Aplicar filtros</button>
         <button class="btn ghost" id="btnLimpar">Limpar tudo</button>
@@ -312,7 +327,18 @@ loadOverview();
 // ---------- EXPLORER (DuckDB-WASM sobre explorer.parquet) ----------
 let conn=null, PAGE=0, PERPAGE=100, lastCount=0, lastWhere='1=1';
 let sortCol='razao_social', sortDir='ASC';
+let hasEnriched=false; // vira true se o parquet tiver as colunas de Lei do Bem
 const COLS=[['cnpj','CNPJ'],['razao_social','Razão social'],['nome_fantasia','Fantasia'],['municipio_nome','Município'],['cnae_principal','CNAE'],['cnae_descricao','Atividade'],['regime_tributario','Regime'],['porte','Porte'],['situacao','Situação'],['capital_social','Capital'],['divida_uniao_total','Dívida União'],['qtd_socios','Sócios']];
+
+// Lei do Bem — CNAEs intensivos em P&D (ver cnae_pd_intensivo.csv / OCDE-Eurostat)
+const PD_ALTA_DIV=['20','21','26','27','28','29','30','62','72'];
+const PD_ALTA_CL=['3250'];
+const PD_MEDIA_DIV=['01','03','10','11','22','24','25','32','61','63','71'];
+function pdWhere(level){ // 'alta' = só alta; 'media' = alta ou média
+  const div=[...PD_ALTA_DIV]; if(level==='media') div.push(...PD_MEDIA_DIV);
+  const dl=div.map(d=>`'${d}'`).join(','); const cl=PD_ALTA_CL.map(c=>`'${c}'`).join(',');
+  return `(substr(cnae_principal,1,2) IN (${dl}) OR substr(cnae_principal,1,4) IN (${cl}))`;
+}
 
 async function initDuck(){
   try{
@@ -325,6 +351,15 @@ async function initDuck(){
     await db.registerFileURL('explorer.parquet', new URL('explorer.parquet', location.href).href, duckdb.DuckDBDataProtocol.HTTP, false);
     conn = await db.connect();
     await conn.query("CREATE VIEW emp AS SELECT * FROM read_parquet('explorer.parquet')");
+    // Detecta se a base foi enriquecida (montar_flags_leidobem.py) e ativa os filtros extras
+    const info = await conn.query("PRAGMA table_info('emp')");
+    const COLSET = new Set(info.toArray().map(r=>r.name));
+    hasEnriched = COLSET.has('flag_lei_do_bem') && COLSET.has('score_lei_do_bem');
+    if(hasEnriched){
+      COLS.push(['pd_nivel','P&D'],['score_lei_do_bem','Score LdB']);
+      $('#enrichedFilters').style.display='';
+      $('#enrichedHint').style.display='';
+    }
     $('#expStatus').textContent='Preparando listas de filtro…';
     const addOpts=(selId, rows, valKey, txtFn)=>{ const sel=$(selId); for(const r of rows){ const o=document.createElement('option'); o.value=r[valKey]; o.textContent=txtFn(r); sel.appendChild(o);} };
     // Municípios (por nº de empresas)
@@ -384,6 +419,13 @@ function buildWhere(){
   tri('#m_energia','flag_energia',w);
   tri('#m_ceis','flag_ceis',w);
   tri('#m_cnep','flag_cnep',w);
+  const pd=$('#fPD').value; if(pd) w.push(pdWhere(pd));
+  const lb=$('#fLB').value; if(lb==='sim'){ w.push("situacao='Ativa'"); w.push("regime_tributario='Normal (Presumido/Real)'"); w.push(pdWhere('media')); }
+  if(hasEnriched){
+    const ju=$('#fJaUsa').value; if(ju==='sim') w.push('flag_lei_do_bem'); else if(ju==='nao') w.push('NOT flag_lei_do_bem');
+    const inv=$('#fInova').value; if(inv==='com') w.push('flag_inova'); else if(inv==='sem') w.push('NOT flag_inova');
+    const sc=$('#fScore').value; if(sc) w.push(`score_lei_do_bem>=${Number(sc)}`);
+  }
   return w.length?w.join(' AND '):'1=1';
 }
 // realce visual dos seletores de 3 estados
@@ -414,6 +456,8 @@ async function runQuery(reset=true){
     if(c[0]==='capital_social') v = v==null?'':'R$ '+fmt(Math.round(v));
     if(c[0]==='divida_uniao_total'){ const n=Number(v)||0; return `<td>${n>0?'<span class="badge b-warn">R$ '+fmt(Math.round(n))+'</span>':'—'}</td>`; }
     if(c[0]==='situacao'){ const cls = v==='Ativa'?'b-ok':(v==='Baixada'?'b-warn':'b-info'); return `<td><span class="badge ${cls}">${v||''}</span></td>`; }
+    if(c[0]==='pd_nivel'){ return `<td>${v?`<span class="badge b-info">${v}</span>`:'—'}</td>`; }
+    if(c[0]==='score_lei_do_bem'){ const n=v==null?null:Number(v); return `<td>${n==null?'—':`<b style="color:${n>=60?'var(--ok)':'var(--navy)'}">${n}</b>`}</td>`; }
     return `<td>${v==null?'':String(v)}</td>`;
   }).join('')+'</tr>').join('') : `<tr><td colspan="${COLS.length}" class="loading">Nenhum resultado para esse filtro.</td></tr>`;
   $('#expStatus').innerHTML=`<b>${fmt(lastCount)}</b> empresas encontradas para o filtro atual.`;
@@ -438,7 +482,9 @@ const FILTER_LABELS={
   fRegime:'Regime', fSit:'Situação', fPorte:'Porte', fCap:'Capital',
   fAno:'Abertura desde', fMun:'Município', fDiv:'Faixa dívida',
   m_pgfn:'Dívida União', m_comex:'Comex', m_anvisa:'ANVISA', m_pat:'PAT',
-  m_energia:'Energia', m_ceis:'CEIS', m_cnep:'CNEP'
+  m_energia:'Energia', m_ceis:'CEIS', m_cnep:'CNEP',
+  fPD:'Intensidade P&D', fLB:'Potencial Lei do Bem',
+  fJaUsa:'Já usa Lei do Bem', fInova:'Sinal de inovação', fScore:'Score mínimo'
 };
 function buildChips(){
   const box=$('#activeFilters'); box.innerHTML='';
@@ -589,6 +635,16 @@ async function openDrawer(cnpj, tr){
         ${row('Dívida total (CNPJ)', fmtBrl(r.divida_uniao_total))}
         ${row('Inscrições', r.qtd_inscricoes_uniao)}
         ${row('Dívida grupo econômico', fmtBrl(r.divida_uniao_grupo))}
+      </div>
+    </div>` : ''}
+
+    ${(r.pd_nivel!==undefined||r.score_lei_do_bem!==undefined) ? `<div class="drw-sec">
+      <div class="drw-sec-ttl s3">Lei do Bem (potencial)</div>
+      <div class="drw-rows">
+        ${row('Intensidade P&D', r.pd_nivel)}
+        ${row('Score (0–100)', r.score_lei_do_bem)}
+        ${row('Já usa (MCTI)', r.flag_lei_do_bem===undefined?null:(bool(r.flag_lei_do_bem)?'Sim':'Não'))}
+        ${row('Sinal de inovação', r.flag_inova===undefined?null:(bool(r.flag_inova)?'Sim':'Não'))}
       </div>
     </div>` : ''}
 

@@ -2,6 +2,9 @@
 # apenas para análises avançadas. Fica de fora por causa do tamanho (~512 MB).
 empresas_rs.parquet
 
+# Saida do enriquecimento (gerada localmente pelo montar_flags_leidobem.py)
+explorer_enriquecido.parquet
+
 # Lixo de sistema
 Thumbs.db
 desktop.ini

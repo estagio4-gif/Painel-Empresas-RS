@@ -1,0 +1,22 @@
+nivel;tipo;codigo;descricao;base_metodologica
+Alta;divisao;21;Fabricacao de produtos farmoquimicos e farmaceuticos;OCDE - industria de ALTA tecnologia
+Alta;divisao;26;Fabricacao de equip. de informatica, produtos eletronicos e opticos;OCDE - industria de ALTA tecnologia
+Alta;divisao;20;Fabricacao de produtos quimicos;OCDE - industria de media-ALTA tecnologia
+Alta;divisao;27;Fabricacao de maquinas, aparelhos e materiais eletricos;OCDE - industria de media-ALTA tecnologia
+Alta;divisao;28;Fabricacao de maquinas e equipamentos;OCDE - industria de media-ALTA tecnologia (forte no RS)
+Alta;divisao;29;Fabricacao de veiculos automotores, reboques e carrocerias;OCDE - industria de media-ALTA tecnologia
+Alta;divisao;30;Fabricacao de outros equipamentos de transporte;OCDE - inclui aeroespacial (ALTA tecnologia)
+Alta;divisao;62;Atividades dos servicos de tecnologia da informacao (software);Eurostat - servico intensivo em conhecimento de ALTA tecnologia
+Alta;divisao;72;Pesquisa e desenvolvimento cientifico;Atividade-nucleo de P&D
+Alta;classe;3250;Fab. de instrumentos e materiais para uso medico, odontologico e optico;OCDE - ALTA tecnologia (subconjunto da divisao 32)
+Media;divisao;71;Servicos de arquitetura e engenharia, testes e analises tecnicas;Servico intensivo em conhecimento (engenharia aplicada)
+Media;divisao;63;Atividades de prestacao de servicos de informacao;Servico intensivo em conhecimento
+Media;divisao;61;Telecomunicacoes;Servico intensivo em conhecimento de alta tecnologia (parcial)
+Media;divisao;32;Fabricacao de produtos diversos (exceto classe 3250);Industria de media tecnologia
+Media;divisao;24;Metalurgia;Metal-mecanica - inovacao de processo (forte no RS)
+Media;divisao;25;Fabricacao de produtos de metal;Metal-mecanica - inovacao de processo (forte no RS)
+Media;divisao;22;Fabricacao de produtos de borracha e de material plastico;Inovacao em materiais (media-baixa OCDE)
+Media;divisao;10;Fabricacao de produtos alimenticios;Inovacao de processo agroindustrial (forte uso da Lei do Bem no Brasil)
+Media;divisao;11;Fabricacao de bebidas;Inovacao de processo agroindustrial
+Media;divisao;01;Agricultura, pecuaria e servicos relacionados;Inovacao agro - sementes, biotecnologia (relevante no RS)
+Media;divisao;03;Pesca e aquicultura;Biotecnologia aquicola
