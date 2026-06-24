@@ -1,0 +1,41 @@
+==============================================================
+ PAINEL TRIBUTÁRIO — EMPRESAS DO RIO GRANDE DO SUL
+==============================================================
+
+COMO ABRIR O PAINEL
+-------------------
+1) Dê DOIS cliques em "abrir_painel.bat".
+2) Vai abrir uma janela preta (o servidor) — NÃO feche enquanto usar o painel.
+3) O navegador abre sozinho em http://localhost:8777/painel_rs.html
+4) Para fechar, feche o navegador e depois a janela preta.
+
+(Precisa ser pelo .bat porque o "Explorador de Nichos" consulta a base
+ diretamente no navegador, e isso exige um servidor local. A aba
+ "Visão Geral" abre mesmo dando dois cliques no painel_rs.html.)
+
+O QUE TEM NO PAINEL
+-------------------
+• VISÃO GERAL: gráficos de regime tributário, porte, situação cadastral,
+  aberturas por ano, capital social, top CNAEs, top municípios, os
+  marcadores de cruzamento (CEIS, CNEP, setor elétrico, ANVISA,
+  comércio exterior, PAT) e a DÍVIDA ATIVA DA UNIÃO (PGFN): total,
+  composição (não-prev / INSS / FGTS) e os 20 maiores devedores do RS.
+• EXPLORADOR DE NICHOS: filtros combináveis (razão social, CNAE, regime,
+  situação, porte, município, capital mínimo, dívida União mínima) +
+  caixas para CRUZAR com os cadastros públicos, inclusive "Dívida Ativa
+  União". Botão para exportar o resultado filtrado em CSV.
+• FONTES & METODOLOGIA: de onde vem cada dado e as ressalvas.
+
+ARQUIVOS
+--------
+painel_rs.html ....... o painel
+agregados.json ....... números que alimentam os gráficos
+explorer.parquet ..... base enxuta consultada pelo explorador
+empresas_rs.parquet .. base COMPLETA (todas as colunas) p/ análises avançadas
+abrir_painel.bat ..... atalho que liga o servidor e abre o painel
+
+OBSERVAÇÃO TRIBUTÁRIA
+---------------------
+O regime "Normal (Presumido/Real)" é inferido por exclusão (não é MEI
+nem optante do Simples). A Receita não divulga a opção entre Lucro
+Presumido e Lucro Real.

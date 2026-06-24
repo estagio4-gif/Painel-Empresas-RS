@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Tributário — Empresas do RS</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#0D263F; --gold:#B1976B; --silver:#b1b1b1; --bg:#f4f5f7; --card:#fff;
+    --txt:#1d2a40; --muted:#6b7280; --line:#e5e7eb; --ok:#2e7d32; --warn:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--txt)}
+  header{background:var(--navy);color:#fff;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  header h1{font-size:20px;margin:0;font-weight:600;letter-spacing:.5px}
+  header .sub{color:var(--gold);font-size:13px;margin-top:3px}
+  .tabs{display:flex;gap:6px;background:var(--navy);padding:0 28px}
+  .tab{padding:11px 20px;color:#cfd6e0;cursor:pointer;font-size:14px;border-bottom:3px solid transparent}
+  .tab.active{color:#fff;border-bottom-color:var(--gold);font-weight:600}
+  main{padding:22px 28px;max-width:1500px;margin:0 auto}
+  .view{display:none} .view.active{display:block}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+  .kpi{background:var(--card);border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.07);border-left:4px solid var(--gold)}
+  .kpi .v{font-size:26px;font-weight:700;color:var(--navy)}
+  .kpi .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .card{background:var(--card);border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+  .card h3{margin:0 0 12px;font-size:14px;color:var(--navy);font-weight:600}
+  .col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-12{grid-column:span 12}.col-8{grid-column:span 8}
+  @media(max-width:900px){.col-6,.col-4,.col-8{grid-column:span 12}}
+  canvas{max-height:300px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+  th{background:#f8f9fb;color:var(--navy);position:sticky;top:0;font-weight:600}
+  .filters{background:var(--card);border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.07);margin-bottom:16px}
+  .filters .row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+  .fld{display:flex;flex-direction:column;gap:4px}
+  .fld label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+  .fld input,.fld select{padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:13px;min-width:150px;background:#fff}
+  .chips{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px}
+  .chips label{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer;color:var(--txt)}
+  .btn{background:var(--navy);color:#fff;border:none;padding:9px 18px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600}
+  .btn.gold{background:var(--gold)}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+  .status{font-size:13px;color:var(--muted);margin:10px 2px}
+  .badge{display:inline-block;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:600}
+  .b-ok{background:#e8f5e9;color:var(--ok)} .b-warn{background:#fdecea;color:var(--warn)} .b-info{background:#eef2f7;color:var(--navy)}
+  .tablewrap{background:var(--card);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);max-height:60vh;overflow:auto}
+  .loading{padding:40px;text-align:center;color:var(--muted)}
+  .pager{display:flex;gap:8px;align-items:center;margin:12px 2px;font-size:13px}
+  .note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .fhelp{font-size:12.5px;color:var(--muted);margin:0 0 12px;line-height:1.5}
+  .fgroup{border:1px solid var(--line);border-radius:9px;padding:12px 14px;margin-bottom:12px}
+  .fgroup.marc{border-color:#e3d9c6;background:#fcfaf5}
+  .fgtitle{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  .fgroup.marc .fgtitle{color:#8a6d3b}
+  .fld select.tri{background:#fff}
+  .fld select.tri[data-on="com"]{border-color:var(--ok);background:#f1f8f2;color:var(--ok);font-weight:600}
+  .fld select.tri[data-on="sem"]{border-color:var(--warn);background:#fdf2f1;color:var(--warn);font-weight:600}
+  .fld label .hint{cursor:help;color:var(--gold);font-weight:700;margin-left:3px}
+  #overlay{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:999;display:none}
+  #overlay.on{display:block}
+  #drawer{position:fixed;right:0;top:0;height:100vh;width:400px;background:var(--card);
+    box-shadow:-4px 0 24px rgba(0,0,0,.18);z-index:1000;
+    transform:translateX(100%);transition:transform .25s ease;
+    display:flex;flex-direction:column;overflow:hidden}
+  #drawer.on{transform:translateX(0)}
+  .drw-hd{background:var(--navy);color:#fff;padding:16px 18px;display:flex;
+    align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0}
+  .drw-hd-txt{flex:1}
+  .drw-hd-name{font-size:15px;font-weight:700;line-height:1.3;margin-bottom:3px}
+  .drw-hd-cnpj{font-size:12px;color:var(--gold);font-family:monospace}
+  .drw-x{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;
+    line-height:1;padding:0;flex-shrink:0;margin-top:-2px}
+  .drw-body{overflow-y:auto;flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+  .drw-sec{}
+  .drw-sec-ttl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    color:#fff;padding:2px 9px;border-radius:3px;display:inline-block;margin-bottom:8px}
+  .drw-sec-ttl.s1{background:var(--navy)}
+  .drw-sec-ttl.s2{background:#3e6b9e}
+  .drw-sec-ttl.s3{background:#4e7c3f}
+  .drw-sec-ttl.s4{background:var(--warn)}
+  .drw-rows{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .drw-row{display:flex;flex-direction:column;gap:1px}
+  .drw-row.full{grid-column:span 2}
+  .drw-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .drw-val{font-size:13px;color:var(--txt);word-break:break-word}
+  .drw-val a{color:var(--navy);text-decoration:underline}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;
+    font-weight:600;margin:2px;background:#eef2f7;color:var(--navy)}
+  .pill.warn{background:#fdecea;color:var(--warn)}
+  .pill.ok{background:#e8f5e9;color:var(--ok)}
+  tr.sel td{background:#e8f0fb!important}
+  tr{cursor:pointer}
+  #sobre table a{color:var(--navy);font-weight:600;text-decoration:underline;white-space:nowrap}
+  #activeFilters { display:flex; flex-wrap:wrap; gap:6px; margin:8px 2px 4px; }
+  .chip { display:inline-flex; align-items:center; gap:5px; background:#eef2f7; border:1px solid #d0d9e8; border-radius:14px; padding:3px 10px; font-size:12px; color:var(--navy); }
+  .chip button { background:none; border:none; cursor:pointer; color:var(--muted); font-size:13px; line-height:1; padding:0; }
+  .chip button:hover { color:var(--warn); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>PAINEL TRIBUTÁRIO — EMPRESAS DO RIO GRANDE DO SUL</h1>
+    <div class="sub">Base: Dados Abertos do CNPJ (Receita Federal) + cruzamentos públicos &nbsp;•&nbsp; <span id="ger"></span></div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:28px;font-weight:700" id="kpiTotal">—</div>
+    <div style="font-size:11px;color:var(--gold);text-transform:uppercase">estabelecimentos no RS</div>
+  </div>
+</header>
+<div class="tabs">
+  <div class="tab active" data-v="overview">Visão Geral</div>
+  <div class="tab" data-v="explorer">Explorador de Nichos</div>
+  <div class="tab" data-v="sobre">Fontes & Metodologia</div>
+</div>
+
+<main>
+  <!-- ===== OVERVIEW ===== -->
+  <section class="view active" id="overview">
+    <div class="kpis" id="kpis"></div>
+    <div class="grid">
+      <div class="card col-4"><h3>Regime tributário (ativas)</h3><canvas id="cRegime"></canvas></div>
+      <div class="card col-4"><h3>Porte (ativas)</h3><canvas id="cPorte"></canvas></div>
+      <div class="card col-4"><h3>Situação cadastral</h3><canvas id="cSit"></canvas></div>
+      <div class="card col-8"><h3>Aberturas por ano</h3><canvas id="cAno"></canvas></div>
+      <div class="card col-4"><h3>Capital social (ativas)</h3><canvas id="cCap"></canvas></div>
+      <div class="card col-6"><h3>Top 15 CNAE (ativas)</h3><canvas id="cCnae" height="320"></canvas></div>
+      <div class="card col-6"><h3>Top 15 municípios (ativas)</h3><canvas id="cMun" height="320"></canvas></div>
+      <div class="card col-6"><h3>Marcadores especiais (cruzamentos)</h3><canvas id="cFlags"></canvas>
+        <div class="note">Empresas do RS encontradas em cadastros públicos específicos.</div></div>
+      <div class="card col-6"><h3>Top naturezas jurídicas (ativas)</h3><div style="max-height:300px;overflow:auto"><table id="tNat"></table></div></div>
+      <div class="card col-4"><h3>Composição da Dívida Ativa da União</h3><canvas id="cDiv"></canvas>
+        <div class="note">Inclui todas as situações (em cobrança, suspensa, ajuizada).</div></div>
+      <div class="card col-8"><h3>Maiores devedores da União no RS (top 20)</h3><div style="max-height:320px;overflow:auto"><table id="tPgfn"></table></div></div>
+    </div>
+  </section>
+
+  <!-- ===== EXPLORER ===== -->
+  <section class="view" id="explorer">
+    <div class="filters">
+      <p class="fhelp">Monte o seu nicho combinando os menus abaixo (todos opcionais) e clique <b>Aplicar filtros</b>. Tudo é dropdown — basta escolher o valor. Os <b>Marcadores especiais</b> cruzam com bases públicas e têm 3 modos: <b>(indiferente)</b>, <b>Somente COM</b> ou <b>Somente SEM</b> aquela característica.</p>
+
+      <div class="fgroup">
+        <div class="fgtitle">Cadastro & atividade</div>
+        <div class="row">
+          <div class="fld"><label>Buscar por nome</label><input id="fNome" placeholder="razão social ou fantasia"></div>
+          <div class="fld"><label>Buscar por CNPJ</label><input id="fCnpj" placeholder="00.000.000/0000-00 ou só números"></div>
+          <div class="fld"><label>Setor (seção CNAE)</label><select id="fSecao">
+            <option value="">(todos os setores)</option>
+            <option value="01-03">Agropecuária</option>
+            <option value="05-09">Indústria extrativa</option>
+            <option value="10-33">Indústria de transformação</option>
+            <option value="35-35">Eletricidade e gás</option>
+            <option value="36-39">Água, esgoto e resíduos</option>
+            <option value="41-43">Construção</option>
+            <option value="45-47">Comércio e reparação de veículos</option>
+            <option value="49-53">Transporte e armazenagem</option>
+            <option value="55-56">Alojamento e alimentação</option>
+            <option value="58-63">Informação e comunicação</option>
+            <option value="64-66">Atividades financeiras e seguros</option>
+            <option value="68-68">Atividades imobiliárias</option>
+            <option value="69-75">Profissionais, científicas e técnicas</option>
+            <option value="77-82">Atividades administrativas e serviços</option>
+            <option value="84-84">Administração pública</option>
+            <option value="85-85">Educação</option>
+            <option value="86-88">Saúde humana e serviços sociais</option>
+            <option value="90-93">Artes, cultura, esporte e recreação</option>
+            <option value="94-96">Outras atividades de serviços</option>
+            <option value="97-97">Serviços domésticos</option>
+            <option value="99-99">Organismos internacionais</option>
+          </select></div>
+          <div class="fld"><label>Atividade (CNAE)</label><select id="fCnae"><option value="">(todas as atividades)</option></select></div>
+          <div class="fld"><label>Onde buscar o CNAE</label><select id="fCnaeMod"><option value="qualquer">Principal ou secundária</option><option value="principal">Só principal</option><option value="secundaria">Só secundária</option></select></div>
+          <div class="fld"><label>Natureza jurídica</label><select id="fNat"><option value="">(todas)</option></select></div>
+          <div class="fld"><label>Matriz ou filial</label><select id="fMat"><option value="">(ambas)</option><option>Matriz</option><option>Filial</option></select></div>
+          <div class="fld"><label>Nº de sócios</label><select id="fSoc"><option value="">(qualquer)</option><option value="0-0">Sem sócios (MEI/EI)</option><option value="1-1">1 sócio</option><option value="2-2">2 sócios</option><option value="3-5">3 a 5</option><option value="6-">6 ou mais</option></select></div>
+          <div class="fld"><label>Tem e-mail?</label><select id="fEmail"><option value="">(indiferente)</option><option value="com">Com e-mail</option><option value="sem">Sem e-mail</option></select></div>
+          <div class="fld"><label>Tem telefone?</label><select id="fTel"><option value="">(indiferente)</option><option value="com">Com telefone</option><option value="sem">Sem telefone</option></select></div>
+        </div>
+      </div>
+
+      <div class="fgroup">
+        <div class="fgtitle">Tributário, porte & localização</div>
+        <div class="row">
+          <div class="fld"><label>Regime tributário</label><select id="fRegime"><option value="">(todos)</option><option>MEI</option><option>Simples Nacional</option><option>Normal (Presumido/Real)</option></select></div>
+          <div class="fld"><label>Situação cadastral</label><select id="fSit"><option value="">(todas)</option><option>Ativa</option><option>Baixada</option><option>Suspensa</option><option>Inapta</option><option>Nula</option></select></div>
+          <div class="fld"><label>Porte</label><select id="fPorte"><option value="">(todos)</option><option>Microempresa (ME)</option><option>Empresa de Pequeno Porte (EPP)</option><option>Demais</option><option value="Nao informado">Não informado</option></select></div>
+          <div class="fld"><label>Faixa de capital social</label><select id="fCap"><option value="">(qualquer)</option><option value="0-10000">Até R$ 10 mil</option><option value="10000-100000">R$ 10 mil – 100 mil</option><option value="100000-1000000">R$ 100 mil – 1 mi</option><option value="1000000-10000000">R$ 1 mi – 10 mi</option><option value="10000000-">Acima de R$ 10 mi</option></select></div>
+          <div class="fld"><label>Aberta a partir de</label><select id="fAno"><option value="">(qualquer ano)</option><option value="2025">2025</option><option value="2023">2023</option><option value="2020">2020</option><option value="2015">2015</option><option value="2010">2010</option><option value="2000">2000</option></select></div>
+          <div class="fld"><label>Município</label><select id="fMun"><option value="">(todos)</option></select></div>
+        </div>
+      </div>
+
+      <div class="fgroup marc">
+        <div class="fgtitle">Marcadores especiais — cruzamentos com bases públicas</div>
+        <p class="fhelp">Para cada um: <b>(indiferente)</b> não filtra · <b style="color:var(--ok)">Somente COM</b> traz só quem está na base · <b style="color:var(--warn)">Somente SEM</b> traz só quem não está. Ex.: <i>Dívida União = Somente SEM</i> revela empresas sem passivo federal (bons prospects); <i>= Somente COM</i> revela alvos de contencioso/regularização.</p>
+        <div class="row">
+          <div class="fld"><label>Dívida Ativa União<span class="hint" title="Débitos federais inscritos na PGFN (IRPJ, PIS/COFINS, INSS, FGTS etc.)">ⓘ</span></label><select id="m_pgfn" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM dívida</option><option value="sem">Somente SEM dívida</option></select></div>
+          <div class="fld"><label>Faixa de dívida União</label><select id="fDiv"><option value="">(qualquer)</option><option value="100000-">≥ R$ 100 mil</option><option value="1000000-">≥ R$ 1 mi</option><option value="10000000-">≥ R$ 10 mi</option><option value="100000000-">≥ R$ 100 mi</option></select></div>
+          <div class="fld"><label>Comércio exterior<span class="hint" title="Habilitação no RADAR/Siscomex (importa/exporta)">ⓘ</span></label><select id="m_comex" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld"><label>ANVISA<span class="hint" title="Autorização de Funcionamento (setor saúde: farmácia, distribuidora, dispositivos)">ⓘ</span></label><select id="m_anvisa" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld"><label>PAT<span class="hint" title="Beneficiária do Programa de Alimentação do Trabalhador (benefício de IRPJ)">ⓘ</span></label><select id="m_pat" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld"><label>Setor elétrico<span class="hint" title="Agente da CCEE/ANEEL (geração, transmissão, distribuição, comercialização)">ⓘ</span></label><select id="m_energia" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld"><label>CEIS<span class="hint" title="Empresas inidôneas/suspensas de licitar (Portal da Transparência)">ⓘ</span></label><select id="m_ceis" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld"><label>CNEP<span class="hint" title="Punidas pela Lei Anticorrupção">ⓘ</span></label><select id="m_cnep" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:4px">
+        <button class="btn" id="btnFiltrar">Aplicar filtros</button>
+        <button class="btn ghost" id="btnLimpar">Limpar tudo</button>
+        <button class="btn gold" id="btnCsv">Exportar resultado (CSV)</button>
+      </div>
+      <div id="activeFilters"></div>
+    </div>
+    <div class="status" id="expStatus">Carregando motor de consulta…</div>
+    <div class="tablewrap"><table id="tExp"><thead></thead><tbody><tr><td class="loading">Aguardando…</td></tr></tbody></table></div>
+    <div class="pager">
+      <button class="btn ghost" id="prev">‹ Anterior</button>
+      <span id="pageInfo"></span>
+      <button class="btn ghost" id="next">Próxima ›</button>
+    </div>
+  </section>
+
+  <!-- ===== SOBRE ===== -->
+  <section class="view" id="sobre">
+    <div class="card">
+      <h3>Fontes de dados (todas públicas)</h3>
+      <table>
+        <tr><th>Fonte</th><th>O que traz</th><th>Atualização</th><th>Download</th></tr>
+        <tr><td>Dados Abertos do CNPJ — Receita Federal</td><td>Cadastro, CNAE, capital, situação, sócios, opção pelo Simples/MEI</td><td>Mensal</td><td><a href="https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/consultas/dados-publicos-cnpj" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+        <tr><td>PGFN — Dívida Ativa da União (dados abertos)</td><td>Dívida federal por CNPJ: não-previdenciário, previdenciário (INSS) e FGTS, valor e nº de inscrições</td><td>Trimestral (2026 T1)</td><td><a href="https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+        <tr><td>CEIS — Portal da Transparência</td><td>Empresas inidôneas/suspensas de licitar</td><td>Diária</td><td><a href="https://portaldatransparencia.gov.br/download-de-dados/ceis" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+        <tr><td>CNEP — Portal da Transparência</td><td>Punições da Lei Anticorrupção (com multa)</td><td>Diária</td><td><a href="https://portaldatransparencia.gov.br/download-de-dados/cnep" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+        <tr><td>CCEE / ANEEL</td><td>Agentes do setor elétrico</td><td>Mensal</td><td><a href="https://dadosabertos.aneel.gov.br/dataset" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+        <tr><td>ANVISA — AFE</td><td>Autorização de funcionamento (saúde)</td><td>Periódica</td><td><a href="https://www.gov.br/anvisa/pt-br/acessoainformacao/dadosabertos" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+        <tr><td>Siscomex / RADAR (Cadint)</td><td>Habilitação a comércio exterior</td><td>Periódica</td><td><a href="https://www.gov.br/siscomex/pt-br" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+        <tr><td>PAT — Min. do Trabalho</td><td>Beneficiárias do Programa de Alimentação do Trabalhador</td><td>Periódica</td><td><a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/empregador/programa-de-alimentacao-do-trabalhador-pat" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+      </table>
+      <div class="note" style="margin-top:14px">
+        <b>Observações tributárias.</b> O regime "Normal (Presumido/Real)" é inferido por exclusão (empresas que <i>não</i> são MEI nem optantes do Simples) — a Receita não publica a opção entre Lucro Presumido e Lucro Real. A base abrange todos os estabelecimentos com UF = RS, incluindo baixados (use o filtro de situação). Capital social é o valor declarado, não o faturamento.
+        <br><br><b>Dívida Ativa da União (PGFN).</b> Valores e inscrições são da base trimestral da PGFN (2026 T1), apenas pessoas jurídicas com UF do devedor = RS. A dívida é casada pelo CNPJ completo do estabelecimento; somam-se as três origens (não-previdenciário/SIDA, previdenciário/INSS e FGTS) e todas as situações (em cobrança, suspensa, ajuizada). Há também um indicador no nível do grupo econômico (raiz do CNPJ). A inclusão na lista não significa débito exigível definitivo — pode estar suspenso ou em discussão judicial.
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+const $ = s => document.querySelector(s);
+const fmt = n => (n==null?'—':Number(n).toLocaleString('pt-BR'));
+const PALE = ['#0D263F','#B1976B','#5b7a9d','#cbb68f','#8aa1b8','#e0d2b8','#3e5870','#9a8259','#aebfcf','#d9c9a8','#22384f','#7d6a45'];
+
+// ---------- OVERVIEW (agregados.json) ----------
+let AGG=null;
+async function loadOverview(){
+  AGG = await (await fetch('agregados.json')).json();
+  $('#ger').textContent = 'gerado em '+AGG.gerado_em;
+  $('#kpiTotal').textContent = fmt(AGG.total);
+  const simples = (AGG.por_regime.find(r=>r.regime==='Simples Nacional')||{}).n||0;
+  const mei = (AGG.por_regime.find(r=>r.regime==='MEI')||{}).n||0;
+  const normal = (AGG.por_regime.find(r=>r.regime==='Normal (Presumido/Real)')||{}).n||0;
+  const kpis=[
+    ['Estabelecimentos (total)',AGG.total],
+    ['Ativos',AGG.total_ativas],
+    ['Optantes Simples',simples],
+    ['MEI',mei],
+    ['Normal (Presumido/Real)',normal],
+  ];
+  $('#kpis').innerHTML = kpis.map(k=>`<div class="kpi"><div class="v">${fmt(k[1])}</div><div class="l">${k[0]}</div></div>`).join('');
+
+  // KPIs de divida ativa da Uniao
+  if(AGG.pgfn){
+    const milhoes = v => 'R$ '+ (v>=1e9? (v/1e9).toLocaleString('pt-BR',{maximumFractionDigits:1})+' bi' : (v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:0})+' mi');
+    const k2=[
+      ['CNPJs c/ dívida União',AGG.pgfn.cnpjs_com_divida,'#c0392b'],
+      ['Dívida Ativa União (total)',null,'#c0392b',milhoes(AGG.pgfn.total)],
+      ['→ Não-previdenciário',null,'#8a5a00',milhoes(AGG.pgfn.nao_previdenciario)],
+      ['→ Previdenciário (INSS)',null,'#8a5a00',milhoes(AGG.pgfn.previdenciario)],
+      ['→ FGTS',null,'#8a5a00',milhoes(AGG.pgfn.fgts)],
+    ];
+    $('#kpis').innerHTML += k2.map(k=>`<div class="kpi" style="border-left-color:${k[2]}"><div class="v" style="font-size:21px">${k[3]||fmt(k[1])}</div><div class="l">${k[0]}</div></div>`).join('');
+  }
+
+  const doughnut=(id,labels,data)=>new Chart($(id),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:PALE}]},options:{plugins:{legend:{position:'right',labels:{font:{size:11}}}}}});
+  const bar=(id,labels,data,horiz)=>new Chart($(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'#0D263F'}]},options:{indexAxis:horiz?'y':'x',plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:10}}}}}});
+
+  doughnut('#cRegime',AGG.por_regime.map(r=>r.regime),AGG.por_regime.map(r=>r.n));
+  bar('#cPorte',AGG.por_porte.map(r=>r.porte),AGG.por_porte.map(r=>r.n));
+  doughnut('#cSit',AGG.por_situacao.map(r=>r.situacao),AGG.por_situacao.map(r=>r.n));
+  new Chart($('#cAno'),{type:'line',data:{labels:AGG.por_ano.map(r=>r.ano),datasets:[{data:AGG.por_ano.map(r=>r.n),borderColor:'#B1976B',backgroundColor:'rgba(177,151,107,.15)',fill:true,tension:.3,pointRadius:0}]},options:{plugins:{legend:{display:false}}}});
+  bar('#cCap',AGG.capital_buckets.map(r=>r.faixa),AGG.capital_buckets.map(r=>r.n));
+  bar('#cCnae',AGG.top_cnae.slice(0,15).map(r=>r.cnae_principal+' '+(r.descricao||'').slice(0,32)),AGG.top_cnae.slice(0,15).map(r=>r.n),true);
+  bar('#cMun',AGG.top_municipio.slice(0,15).map(r=>r.municipio),AGG.top_municipio.slice(0,15).map(r=>r.n),true);
+  const fl=AGG.flags; bar('#cFlags',Object.keys(fl),Object.values(fl),true);
+  $('#tNat').innerHTML='<tr><th>Natureza jurídica</th><th>Ativas</th></tr>'+AGG.por_natureza.map(r=>`<tr><td>${r.natureza}</td><td>${fmt(r.n)}</td></tr>`).join('');
+
+  // Dívida ativa da União
+  if(AGG.pgfn){
+    new Chart($('#cDiv'),{type:'doughnut',data:{labels:['Não-previdenciário','Previdenciário (INSS)','FGTS'],datasets:[{data:[AGG.pgfn.nao_previdenciario,AGG.pgfn.previdenciario,AGG.pgfn.fgts],backgroundColor:['#0D263F','#B1976B','#8aa1b8']}]},options:{plugins:{legend:{position:'bottom',labels:{font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': R$ '+Number(c.raw).toLocaleString('pt-BR',{maximumFractionDigits:0})}}}}});
+  }
+  if(AGG.pgfn_top){
+    const brl=v=>'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    $('#tPgfn').innerHTML='<tr><th>CNPJ</th><th>Razão social</th><th>Município</th><th>Dívida</th><th>Inscrições</th></tr>'+
+      AGG.pgfn_top.map(r=>`<tr><td>${r.cnpj}</td><td>${r.razao_social||''}</td><td>${r.municipio_nome||''}</td><td>${brl(r.divida)}</td><td>${fmt(r.qtd_inscricoes_uniao)}</td></tr>`).join('');
+  }
+}
+loadOverview();
+
+// ---------- EXPLORER (DuckDB-WASM sobre explorer.parquet) ----------
+let conn=null, PAGE=0, PERPAGE=100, lastCount=0, lastWhere='1=1';
+let sortCol='razao_social', sortDir='ASC';
+const COLS=[['cnpj','CNPJ'],['razao_social','Razão social'],['nome_fantasia','Fantasia'],['municipio_nome','Município'],['cnae_principal','CNAE'],['cnae_descricao','Atividade'],['regime_tributario','Regime'],['porte','Porte'],['situacao','Situação'],['capital_social','Capital'],['divida_uniao_total','Dívida União'],['qtd_socios','Sócios']];
+
+async function initDuck(){
+  try{
+    const duckdb = await import('https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm');
+    const B = duckdb.getJsDelivrBundles();
+    const b = await duckdb.selectBundle(B);
+    const worker = await duckdb.createWorker(b.mainWorker);
+    const db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
+    await db.instantiate(b.mainModule, b.pthreadWorker);
+    await db.registerFileURL('explorer.parquet', new URL('explorer.parquet', location.href).href, duckdb.DuckDBDataProtocol.HTTP, false);
+    conn = await db.connect();
+    await conn.query("CREATE VIEW emp AS SELECT * FROM read_parquet('explorer.parquet')");
+    $('#expStatus').textContent='Preparando listas de filtro…';
+    const addOpts=(selId, rows, valKey, txtFn)=>{ const sel=$(selId); for(const r of rows){ const o=document.createElement('option'); o.value=r[valKey]; o.textContent=txtFn(r); sel.appendChild(o);} };
+    // Municípios (por nº de empresas)
+    const m = await conn.query("SELECT municipio_nome, count(*) n FROM emp WHERE municipio_nome IS NOT NULL GROUP BY 1 ORDER BY n DESC");
+    addOpts('#fMun', m.toArray(), 'municipio_nome', r=>`${r.municipio_nome} (${Number(r.n).toLocaleString('pt-BR')})`);
+    // CNAE (código — descrição, por nº de empresas)
+    const cn = await conn.query("SELECT cnae_principal, any_value(cnae_descricao) d, count(*) n FROM emp WHERE cnae_principal IS NOT NULL GROUP BY 1 ORDER BY n DESC");
+    addOpts('#fCnae', cn.toArray(), 'cnae_principal', r=>`${r.cnae_principal} — ${(r.d||'').slice(0,55)} (${Number(r.n).toLocaleString('pt-BR')})`);
+    // Natureza jurídica
+    const nt = await conn.query("SELECT natureza_descricao, count(*) n FROM emp WHERE natureza_descricao IS NOT NULL GROUP BY 1 ORDER BY n DESC");
+    addOpts('#fNat', nt.toArray(), 'natureza_descricao', r=>`${r.natureza_descricao} (${Number(r.n).toLocaleString('pt-BR')})`);
+    $('#expStatus').textContent='Motor pronto. Defina os filtros e clique em "Aplicar filtros".';
+    runQuery();
+  }catch(e){
+    $('#expStatus').innerHTML='<span class="b-warn badge">Explorador indisponível</span> — abra o painel pelo atalho <b>abrir_painel.bat</b> (servidor local). Detalhe: '+e.message;
+  }
+}
+
+function range(id, col, w){ // "min-max" -> col>=min [AND col<max]
+  const v=$(id).value; if(!v) return;
+  const [a,b]=v.split('-');
+  if(a) w.push(`${col}>=${Number(a)}`);
+  if(b) w.push(`${col}<${Number(b)}`);
+}
+function tri(id, col, w){ // ''/com/sem
+  const v=$(id).value; if(v==='com') w.push(col); else if(v==='sem') w.push('NOT '+col);
+}
+function buildWhere(){
+  const w=[]; const esc=s=>s.replace(/'/g,"''");
+  const nome=$('#fNome').value.trim(); if(nome) w.push(`(upper(razao_social) LIKE upper('%${esc(nome)}%') OR upper(coalesce(nome_fantasia,'')) LIKE upper('%${esc(nome)}%'))`);
+  const cnpj=$('#fCnpj').value.replace(/\D/g,''); if(cnpj) w.push(`replace(replace(replace(cnpj,'.',''),'/',''),'-','') LIKE '%${cnpj}%'`);
+  const sec=$('#fSecao').value; if(sec){const [a,b]=sec.split('-'); w.push(`substr(cnae_principal,1,2) BETWEEN '${a}' AND '${b}'`);}
+  const cnae=$('#fCnae').value;
+  if(cnae){
+    const mod=$('#fCnaeMod').value||'qualquer';
+    const inSec=`(',' || coalesce(cnae_secundaria,'') || ',') LIKE '%,${esc(cnae)},%'`;
+    if(mod==='principal') w.push(`cnae_principal='${esc(cnae)}'`);
+    else if(mod==='secundaria') w.push(inSec);
+    else w.push(`(cnae_principal='${esc(cnae)}' OR ${inSec})`);
+  }
+  const nat=$('#fNat').value; if(nat) w.push(`natureza_descricao='${esc(nat)}'`);
+  const mat=$('#fMat').value; if(mat) w.push(`matriz_filial='${esc(mat)}'`);
+  range('#fSoc','qtd_socios',w);
+  const em=$('#fEmail').value; if(em==='com') w.push("(email IS NOT NULL AND email<>'')"); else if(em==='sem') w.push("(email IS NULL OR email='')");
+  const tel=$('#fTel').value; if(tel==='com') w.push("(telefone IS NOT NULL AND telefone<>'')"); else if(tel==='sem') w.push("(telefone IS NULL OR telefone='')");
+  const reg=$('#fRegime').value; if(reg) w.push(`regime_tributario='${esc(reg)}'`);
+  const sit=$('#fSit').value; if(sit) w.push(`situacao='${esc(sit)}'`);
+  const porte=$('#fPorte').value; if(porte) w.push(`porte='${esc(porte)}'`);
+  const mun=$('#fMun').value; if(mun) w.push(`municipio_nome='${esc(mun)}'`);
+  const ano=$('#fAno').value; if(ano) w.push(`ano_abertura>=${Number(ano)}`);
+  range('#fCap','capital_social',w);
+  range('#fDiv','divida_uniao_total',w);
+  tri('#m_pgfn','flag_pgfn',w);
+  tri('#m_comex','flag_comex',w);
+  tri('#m_anvisa','flag_anvisa',w);
+  tri('#m_pat','flag_pat',w);
+  tri('#m_energia','flag_energia',w);
+  tri('#m_ceis','flag_ceis',w);
+  tri('#m_cnep','flag_cnep',w);
+  return w.length?w.join(' AND '):'1=1';
+}
+// realce visual dos seletores de 3 estados
+document.querySelectorAll('select.tri').forEach(s=>s.addEventListener('change',()=>s.setAttribute('data-on',s.value)));
+// Desabilitar faixa de dívida quando "Dívida União = Somente SEM"
+$('#m_pgfn').addEventListener('change', () => {
+  const isSem = $('#m_pgfn').value === 'sem';
+  $('#fDiv').disabled = isSem;
+  if(isSem) $('#fDiv').value = '';
+  $('#fDiv').closest('.fld').style.opacity = isSem ? '0.4' : '1';
+});
+
+async function runQuery(reset=true){
+  if(!conn) return;
+  if(reset){ PAGE=0; lastWhere=buildWhere(); }
+  $('#expStatus').textContent='Consultando…';
+  const c = await conn.query(`SELECT count(*) n FROM emp WHERE ${lastWhere}`);
+  lastCount = Number(c.toArray()[0].n);
+  const cols = COLS.map(c=>c[0]).join(',');
+  const r = await conn.query(`SELECT ${cols} FROM emp WHERE ${lastWhere} ORDER BY ${sortCol} ${sortDir} LIMIT ${PERPAGE} OFFSET ${PAGE*PERPAGE}`);
+  const rows = r.toArray();
+  $('#tExp thead').innerHTML='<tr>'+COLS.map(c=>{
+    const ind = sortCol===c[0] ? (sortDir==='ASC'?' ▲':' ▼') : ' ⇅';
+    return `<th data-col="${c[0]}" style="cursor:pointer;user-select:none">${c[1]}${ind}</th>`;
+  }).join('')+'</tr>';
+  $('#tExp tbody').innerHTML = rows.length? rows.map(row=>`<tr data-cnpj="${row['cnpj']||''}">`+COLS.map(c=>{
+    let v=row[c[0]];
+    if(c[0]==='capital_social') v = v==null?'':'R$ '+fmt(Math.round(v));
+    if(c[0]==='divida_uniao_total'){ const n=Number(v)||0; return `<td>${n>0?'<span class="badge b-warn">R$ '+fmt(Math.round(n))+'</span>':'—'}</td>`; }
+    if(c[0]==='situacao'){ const cls = v==='Ativa'?'b-ok':(v==='Baixada'?'b-warn':'b-info'); return `<td><span class="badge ${cls}">${v||''}</span></td>`; }
+    return `<td>${v==null?'':String(v)}</td>`;
+  }).join('')+'</tr>').join('') : `<tr><td colspan="${COLS.length}" class="loading">Nenhum resultado para esse filtro.</td></tr>`;
+  $('#expStatus').innerHTML=`<b>${fmt(lastCount)}</b> empresas encontradas para o filtro atual.`;
+  const pages=Math.max(1,Math.ceil(lastCount/PERPAGE));
+  $('#pageInfo').textContent=`Página ${PAGE+1} de ${fmt(pages)}`;
+  if(reset) buildChips();
+}
+
+// ── Cabeçalhos clicáveis para ordenar ──────────────────────────
+$('#tExp thead').addEventListener('click', e=>{
+  const th = e.target.closest('th[data-col]'); if(!th) return;
+  const col = th.dataset.col;
+  if(sortCol===col) sortDir = sortDir==='ASC'?'DESC':'ASC';
+  else { sortCol=col; sortDir='ASC'; }
+  runQuery(false);
+});
+
+// ── Chips de filtros ativos ────────────────────────────────────
+const FILTER_LABELS={
+  fNome:'Nome', fCnpj:'CNPJ', fSecao:'Setor', fCnae:'CNAE', fNat:'Natureza',
+  fMat:'Matriz/Filial', fSoc:'Sócios', fEmail:'E-mail', fTel:'Telefone',
+  fRegime:'Regime', fSit:'Situação', fPorte:'Porte', fCap:'Capital',
+  fAno:'Abertura desde', fMun:'Município', fDiv:'Faixa dívida',
+  m_pgfn:'Dívida União', m_comex:'Comex', m_anvisa:'ANVISA', m_pat:'PAT',
+  m_energia:'Energia', m_ceis:'CEIS', m_cnep:'CNEP'
+};
+function buildChips(){
+  const box=$('#activeFilters'); box.innerHTML='';
+  for(const id in FILTER_LABELS){
+    const el=document.getElementById(id);
+    if(!el || !el.value) continue;
+    const txt = el.tagName==='SELECT'
+      ? el.options[el.selectedIndex].text.replace(/\s*\(.*\)\s*$/,'')
+      : el.value;
+    const chip=document.createElement('span');
+    chip.className='chip';
+    chip.innerHTML='<span></span> <button title="Remover">×</button>';
+    chip.querySelector('span').textContent=`${FILTER_LABELS[id]}: ${txt}`;
+    chip.querySelector('button').addEventListener('click',()=>{
+      el.value='';
+      el.dispatchEvent(new Event('change'));
+      runQuery(true);
+    });
+    box.appendChild(chip);
+  }
+}
+
+$('#btnFiltrar').onclick=()=>runQuery(true);
+$('#btnLimpar').onclick=()=>{document.querySelectorAll('.filters input').forEach(i=>i.value='');document.querySelectorAll('.filters select').forEach(s=>{s.value='';s.removeAttribute('data-on');});$('#fDiv').disabled=false;$('#fDiv').closest('.fld').style.opacity='1';runQuery(true);};
+$('#prev').onclick=()=>{if(PAGE>0){PAGE--;runQuery(false);}};
+$('#next').onclick=()=>{if((PAGE+1)*PERPAGE<lastCount){PAGE++;runQuery(false);}};
+$('#btnCsv').onclick=async()=>{
+  if(!conn)return; $('#expStatus').textContent='Gerando CSV…';
+  const cols=COLS.map(c=>c[0]).join(',');
+  const r=await conn.query(`SELECT ${cols} FROM emp WHERE ${lastWhere} ORDER BY situacao, razao_social LIMIT 100000`);
+  const rows=r.toArray();
+  const head=COLS.map(c=>c[1]).join(';');
+  const body=rows.map(row=>COLS.map(c=>{let v=row[c[0]];return v==null?'':('"'+String(v).replace(/"/g,'""')+'"');}).join(';')).join('\n');
+  const blob=new Blob(['﻿'+head+'\n'+body],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='empresas_rs_filtrado.csv';a.click();
+  $('#expStatus').innerHTML=`<b>${fmt(lastCount)}</b> empresas — CSV exportado (até 100 mil linhas).`;
+};
+initDuck();
+
+// ---------- TABS ----------
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active'); $('#'+t.dataset.v).classList.add('active');
+});
+// ── Drawer ───────────────────────────────────────────────────
+let selTr = null;
+
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('on');
+  document.getElementById('overlay').classList.remove('on');
+  if(selTr){ selTr.classList.remove('sel'); selTr=null; }
+}
+
+function fmtBrl(v){ const n=Number(v)||0; return n>0?'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'; }
+function fmtDate(v){ if(!v||v==='0') return '—'; const s=String(v).replace(/\D/g,''); if(s.length===8) return s.slice(6)+'/'+s.slice(4,6)+'/'+s.slice(0,4); return v; }
+function bool(v){ return v===true||v==='true'||v===1; }
+
+function row(lbl, val, full=false){
+  if(val===null||val===undefined||val===''||val==='None') return '';
+  return `<div class="drw-row${full?' full':''}"><div class="drw-lbl">${lbl}</div><div class="drw-val">${val}</div></div>`;
+}
+function flagPills(r){
+  const flags=[
+    ['flag_comex','Comex (CADINT)','ok'],['flag_anvisa','ANVISA','ok'],
+    ['flag_pat','PAT','ok'],['flag_energia','Setor elétrico','ok'],
+    ['flag_pgfn','Dívida União','warn'],['flag_ceis','CEIS','warn'],['flag_cnep','CNEP','warn'],
+  ];
+  return flags.filter(f=>bool(r[f[0]])).map(f=>`<span class="pill ${f[2]}">${f[1]}</span>`).join('');
+}
+
+async function openDrawer(cnpj, tr){
+  if(!conn) return;
+  if(selTr===tr){ closeDrawer(); return; }
+  if(selTr) selTr.classList.remove('sel');
+  selTr=tr; tr.classList.add('sel');
+
+  const res = await conn.query(`SELECT * FROM emp WHERE cnpj='${cnpj}' LIMIT 1`);
+  const arr = res.toArray();
+  if(!arr.length){ closeDrawer(); return; }
+  const r = arr[0];
+
+  const porteMap={'Microempresa (ME)':'ME','Empresa de Pequeno Porte (EPP)':'EPP','Demais':'Demais','Nao informado':'N/D'};
+
+  document.getElementById('drw-name').textContent = r.razao_social||cnpj;
+  const cnpjNum = String(cnpj).replace(/\D/g,'');
+  document.getElementById('drw-cnpj').innerHTML =
+    `<a href="https://solicitacao.servicos.gov.br/usuarios/login?qrCode=${cnpjNum}" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:underline">${cnpj}</a>`
+    + ` <button id="drw-copy" style="margin-left:6px;background:none;border:1px solid var(--gold);color:var(--gold);border-radius:5px;font-size:10px;padding:2px 6px;cursor:pointer">Copiar</button>`;
+  const copyBtn = document.getElementById('drw-copy');
+  if(copyBtn) copyBtn.addEventListener('click', e=>{
+    e.stopPropagation();
+    navigator.clipboard.writeText(cnpj).then(()=>{
+      copyBtn.textContent='Copiado ✓';
+      setTimeout(()=>{ copyBtn.textContent='Copiar'; }, 1500);
+    });
+  });
+
+  const pills = flagPills(r);
+  const telNum = (r.telefone||'').replace(/\D/g,'');
+  const telHtml = telNum
+    ? `${r.telefone} &nbsp;<a href="tel:${telNum}" style="font-size:11px;color:var(--navy)">[ligar]</a> &nbsp;<a href="https://wa.me/55${telNum}" target="_blank" style="font-size:11px;color:#25D366">[WhatsApp]</a>`
+    : null;
+
+  document.getElementById('drw-body').innerHTML = `
+
+    <div class="drw-sec">
+      <div class="drw-sec-ttl s1">Cadastro</div>
+      <div class="drw-rows">
+        ${row('Nome fantasia', r.nome_fantasia)}
+        ${row('Natureza jurídica', r.natureza_descricao, true)}
+        ${row('Matriz / Filial', r.matriz_filial)}
+        ${row('Situação', r.situacao)}
+        ${row('Abertura', fmtDate(r.data_inicio))}
+        ${row('Município', r.municipio_nome)}
+        ${row('Bairro', r.bairro)}
+      </div>
+    </div>
+
+    <div class="drw-sec">
+      <div class="drw-sec-ttl s1">Atividade & Porte</div>
+      <div class="drw-rows">
+        ${row('CNAE principal', r.cnae_principal ? r.cnae_principal+' — '+(r.cnae_descricao||'') : null, true)}
+        ${row('CNAEs secundários', r.cnae_secundaria, true)}
+        ${row('Regime tributário', r.regime_tributario)}
+        ${row('Porte', porteMap[r.porte]||r.porte)}
+        ${row('Capital social', fmtBrl(r.capital_social))}
+        ${row('Sócios', r.qtd_socios)}
+      </div>
+    </div>
+
+    <div class="drw-sec">
+      <div class="drw-sec-ttl s2">Contato</div>
+      <div class="drw-rows">
+        ${row('Telefone', telHtml)}
+        ${row('E-mail', r.email ? `<a href="mailto:${r.email}">${r.email}</a>` : null, true)}
+      </div>
+    </div>
+
+    ${pills ? `<div class="drw-sec">
+      <div class="drw-sec-ttl s3">Marcadores</div>
+      <div style="margin-top:2px">${pills}</div>
+    </div>` : ''}
+
+    ${bool(r.flag_pgfn) ? `<div class="drw-sec">
+      <div class="drw-sec-ttl s4">Dívida Ativa da União</div>
+      <div class="drw-rows">
+        ${row('Dívida total (CNPJ)', fmtBrl(r.divida_uniao_total))}
+        ${row('Inscrições', r.qtd_inscricoes_uniao)}
+        ${row('Dívida grupo econômico', fmtBrl(r.divida_uniao_grupo))}
+      </div>
+    </div>` : ''}
+
+  `;
+
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('overlay').classList.add('on');
+}
+
+// Delegar click nas linhas da tabela
+document.getElementById('tExp').addEventListener('click', e=>{
+  const tr = e.target.closest('#tExp tbody tr');
+  if(!tr) return;
+  const cnpj = tr.dataset.cnpj;
+  if(cnpj) openDrawer(cnpj, tr);
+});
+
+document.getElementById('drw-x').addEventListener('click', closeDrawer);
+document.getElementById('overlay').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDrawer(); });
+</script>
+
+<div id="overlay"></div>
+<div id="drawer">
+  <div class="drw-hd">
+    <div class="drw-hd-txt">
+      <div class="drw-hd-name" id="drw-name"></div>
+      <div class="drw-hd-cnpj" id="drw-cnpj"></div>
+    </div>
+    <button class="drw-x" id="drw-x">×</button>
+  </div>
+  <div class="drw-body" id="drw-body"></div>
+</div>
+</body>
+</html>

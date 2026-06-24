@@ -1,0 +1,768 @@
+{
+ "total": 4872307,
+ "total_ativas": 1761289,
+ "gerado_em": "24/06/2026",
+ "por_situacao": [
+  {
+   "situacao": "Baixada",
+   "n": 2511812
+  },
+  {
+   "situacao": "Ativa",
+   "n": 1761289
+  },
+  {
+   "situacao": "Inapta",
+   "n": 579199
+  },
+  {
+   "situacao": "Suspensa",
+   "n": 13638
+  },
+  {
+   "situacao": "Nula",
+   "n": 6369
+  }
+ ],
+ "por_regime": [
+  {
+   "regime": "MEI",
+   "n": 831088
+  },
+  {
+   "regime": "Normal (Presumido/Real)",
+   "n": 467696
+  },
+  {
+   "regime": "Simples Nacional",
+   "n": 462505
+  }
+ ],
+ "por_porte": [
+  {
+   "porte": "Microempresa (ME)",
+   "n": 1430021
+  },
+  {
+   "porte": "Demais",
+   "n": 227021
+  },
+  {
+   "porte": "Empresa de Pequeno Porte (EPP)",
+   "n": 104247
+  }
+ ],
+ "por_natureza": [
+  {
+   "natureza": "Empresário (Individual)",
+   "n": 1050654
+  },
+  {
+   "natureza": "Sociedade Empresária Limitada",
+   "n": 553720
+  },
+  {
+   "natureza": "Associação Privada",
+   "n": 47161
+  },
+  {
+   "natureza": "Condomínio Edilício",
+   "n": 37820
+  },
+  {
+   "natureza": "Sociedade Unipessoal de Advocacia",
+   "n": 8933
+  },
+  {
+   "natureza": "Sociedade Anônima Fechada",
+   "n": 8395
+  },
+  {
+   "natureza": "Organização Religiosa",
+   "n": 7915
+  },
+  {
+   "natureza": "Sociedade Simples Limitada",
+   "n": 7482
+  },
+  {
+   "natureza": "Órgão de Direção Local de Partido Político",
+   "n": 6093
+  },
+  {
+   "natureza": "Sociedade Simples Pura",
+   "n": 5891
+  },
+  {
+   "natureza": "Cooperativa",
+   "n": 5431
+  },
+  {
+   "natureza": "Sociedade Anônima Aberta",
+   "n": 4779
+  },
+  {
+   "natureza": "Fundo Público da Administração Direta Municipal",
+   "n": 3659
+  },
+  {
+   "natureza": "Entidade Sindical",
+   "n": 2278
+  },
+  {
+   "natureza": "Sociedade em Conta de Participação",
+   "n": 1442
+  }
+ ],
+ "top_cnae": [
+  {
+   "cnae_principal": "4781400",
+   "descricao": "Comércio varejista de artigos do vestuário e acessórios",
+   "n": 69950
+  },
+  {
+   "cnae_principal": "9602501",
+   "descricao": "Cabeleireiros, manicure e pedicure",
+   "n": 58874
+  },
+  {
+   "cnae_principal": "4399103",
+   "descricao": "Obras de alvenaria",
+   "n": 58224
+  },
+  {
+   "cnae_principal": "7319002",
+   "descricao": "Promoção de vendas",
+   "n": 52362
+  },
+  {
+   "cnae_principal": "8112500",
+   "descricao": "Condomínios prediais",
+   "n": 37745
+  },
+  {
+   "cnae_principal": "8219999",
+   "descricao": "Preparação de documentos e serviços especializados de apoio administrativo não especificados anteriormente",
+   "n": 33889
+  },
+  {
+   "cnae_principal": "4930202",
+   "descricao": "Transporte rodoviário de carga, exceto produtos perigosos e mudanças, intermunicipal, interestadual e internacional",
+   "n": 32245
+  },
+  {
+   "cnae_principal": "4712100",
+   "descricao": "Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - minimercados, mercearias e armazéns",
+   "n": 28379
+  },
+  {
+   "cnae_principal": "9602502",
+   "descricao": "Atividades de estética e outros serviços de cuidados com a beleza",
+   "n": 26780
+  },
+  {
+   "cnae_principal": "4930201",
+   "descricao": "Transporte rodoviário de carga, exceto produtos perigosos e mudanças, municipal.",
+   "n": 25930
+  },
+  {
+   "cnae_principal": "5611203",
+   "descricao": "Lanchonetes, casas de chá, de sucos e similares",
+   "n": 25419
+  },
+  {
+   "cnae_principal": "4321500",
+   "descricao": "Instalação e manutenção elétrica",
+   "n": 24816
+  },
+  {
+   "cnae_principal": "9700500",
+   "descricao": "Serviços domésticos",
+   "n": 24799
+  },
+  {
+   "cnae_principal": "4520001",
+   "descricao": "Serviços de manutenção e reparação mecânica de veículos automotores",
+   "n": 23373
+  },
+  {
+   "cnae_principal": "5611201",
+   "descricao": "Restaurantes e similares",
+   "n": 21656
+  },
+  {
+   "cnae_principal": "4923002",
+   "descricao": "Serviço de transporte de passageiros - locação de automóveis com motorista",
+   "n": 20467
+  },
+  {
+   "cnae_principal": "8599699",
+   "descricao": "Outras atividades de ensino não especificadas anteriormente",
+   "n": 20188
+  },
+  {
+   "cnae_principal": "5620104",
+   "descricao": "Fornecimento de alimentos preparados preponderantemente para consumo domiciliar",
+   "n": 20083
+  },
+  {
+   "cnae_principal": "9430800",
+   "descricao": "Atividades de associações de defesa de direitos sociais",
+   "n": 20007
+  },
+  {
+   "cnae_principal": "8599604",
+   "descricao": "Treinamento em desenvolvimento profissional e gerencial",
+   "n": 19991
+  },
+  {
+   "cnae_principal": "4330404",
+   "descricao": "Serviços de pintura de edifícios em geral",
+   "n": 19129
+  },
+  {
+   "cnae_principal": "5320201",
+   "descricao": "Serviços de malote não realizados pelo Correio Nacional",
+   "n": 18085
+  },
+  {
+   "cnae_principal": "8211300",
+   "descricao": "Serviços combinados de escritório e apoio administrativo",
+   "n": 15592
+  },
+  {
+   "cnae_principal": "4723700",
+   "descricao": "Comércio varejista de bebidas",
+   "n": 15405
+  },
+  {
+   "cnae_principal": "4110700",
+   "descricao": "Incorporação de empreendimentos imobiliários",
+   "n": 15210
+  },
+  {
+   "cnae_principal": "5320202",
+   "descricao": "Serviços de entrega rápida",
+   "n": 14659
+  },
+  {
+   "cnae_principal": "6911701",
+   "descricao": "Serviços advocatícios",
+   "n": 14054
+  },
+  {
+   "cnae_principal": "8230001",
+   "descricao": "Serviços de organização de feiras, congressos, exposições e festas",
+   "n": 13906
+  },
+  {
+   "cnae_principal": "8712300",
+   "descricao": "Atividades de fornecimento de infra-estrutura de apoio e assistência a paciente no domicílio",
+   "n": 13545
+  },
+  {
+   "cnae_principal": "4530703",
+   "descricao": "Comércio a varejo de peças e acessórios novos para veículos automotores",
+   "n": 13279
+  }
+ ],
+ "top_municipio": [
+  {
+   "municipio": "PORTO ALEGRE",
+   "n": 294885
+  },
+  {
+   "municipio": "CAXIAS DO SUL",
+   "n": 92890
+  },
+  {
+   "municipio": "CANOAS",
+   "n": 58307
+  },
+  {
+   "municipio": "PELOTAS",
+   "n": 49610
+  },
+  {
+   "municipio": "NOVO HAMBURGO",
+   "n": 48207
+  },
+  {
+   "municipio": "SANTA MARIA",
+   "n": 42846
+  },
+  {
+   "municipio": "PASSO FUNDO",
+   "n": 41711
+  },
+  {
+   "municipio": "GRAVATAI",
+   "n": 41104
+  },
+  {
+   "municipio": "SAO LEOPOLDO",
+   "n": 34543
+  },
+  {
+   "municipio": "VIAMAO",
+   "n": 28504
+  },
+  {
+   "municipio": "BENTO GONCALVES",
+   "n": 26179
+  },
+  {
+   "municipio": "ALVORADA",
+   "n": 25301
+  },
+  {
+   "municipio": "CACHOEIRINHA",
+   "n": 24698
+  },
+  {
+   "municipio": "RIO GRANDE",
+   "n": 24460
+  },
+  {
+   "municipio": "SANTA CRUZ DO SUL",
+   "n": 23199
+  },
+  {
+   "municipio": "ERECHIM",
+   "n": 22005
+  },
+  {
+   "municipio": "LAJEADO",
+   "n": 20381
+  },
+  {
+   "municipio": "SAPUCAIA DO SUL",
+   "n": 17857
+  },
+  {
+   "municipio": "CAPAO DA CANOA",
+   "n": 15154
+  },
+  {
+   "municipio": "URUGUAIANA",
+   "n": 15096
+  },
+  {
+   "municipio": "IJUI",
+   "n": 14881
+  },
+  {
+   "municipio": "BAGE",
+   "n": 13147
+  },
+  {
+   "municipio": "SAPIRANGA",
+   "n": 12927
+  },
+  {
+   "municipio": "FARROUPILHA",
+   "n": 12415
+  },
+  {
+   "municipio": "GRAMADO",
+   "n": 12414
+  },
+  {
+   "municipio": "CAMPO BOM",
+   "n": 12359
+  },
+  {
+   "municipio": "SANTA ROSA",
+   "n": 12339
+  },
+  {
+   "municipio": "GUAIBA",
+   "n": 12288
+  },
+  {
+   "municipio": "ESTEIO",
+   "n": 11979
+  },
+  {
+   "municipio": "SANTANA DO LIVRAMENTO",
+   "n": 11954
+  }
+ ],
+ "por_ano": [
+  {
+   "ano": 1990,
+   "n": 61643
+  },
+  {
+   "ano": 1991,
+   "n": 66450
+  },
+  {
+   "ano": 1992,
+   "n": 57734
+  },
+  {
+   "ano": 1993,
+   "n": 63427
+  },
+  {
+   "ano": 1994,
+   "n": 62441
+  },
+  {
+   "ano": 1995,
+   "n": 61721
+  },
+  {
+   "ano": 1996,
+   "n": 55933
+  },
+  {
+   "ano": 1997,
+   "n": 61584
+  },
+  {
+   "ano": 1998,
+   "n": 54339
+  },
+  {
+   "ano": 1999,
+   "n": 54872
+  },
+  {
+   "ano": 2000,
+   "n": 53543
+  },
+  {
+   "ano": 2001,
+   "n": 55136
+  },
+  {
+   "ano": 2002,
+   "n": 51594
+  },
+  {
+   "ano": 2003,
+   "n": 50252
+  },
+  {
+   "ano": 2004,
+   "n": 80709
+  },
+  {
+   "ano": 2005,
+   "n": 52719
+  },
+  {
+   "ano": 2006,
+   "n": 51275
+  },
+  {
+   "ano": 2007,
+   "n": 53790
+  },
+  {
+   "ano": 2008,
+   "n": 84496
+  },
+  {
+   "ano": 2009,
+   "n": 66300
+  },
+  {
+   "ano": 2010,
+   "n": 95094
+  },
+  {
+   "ano": 2011,
+   "n": 104947
+  },
+  {
+   "ano": 2012,
+   "n": 146869
+  },
+  {
+   "ano": 2013,
+   "n": 124870
+  },
+  {
+   "ano": 2014,
+   "n": 123734
+  },
+  {
+   "ano": 2015,
+   "n": 126797
+  },
+  {
+   "ano": 2016,
+   "n": 160189
+  },
+  {
+   "ano": 2017,
+   "n": 148554
+  },
+  {
+   "ano": 2018,
+   "n": 170839
+  },
+  {
+   "ano": 2019,
+   "n": 193170
+  },
+  {
+   "ano": 2020,
+   "n": 238100
+  },
+  {
+   "ano": 2021,
+   "n": 246224
+  },
+  {
+   "ano": 2022,
+   "n": 237474
+  },
+  {
+   "ano": 2023,
+   "n": 239102
+  },
+  {
+   "ano": 2024,
+   "n": 287507
+  },
+  {
+   "ano": 2025,
+   "n": 308399
+  },
+  {
+   "ano": 2026,
+   "n": 133610
+  }
+ ],
+ "regime_x_porte": [
+  {
+   "regime": "Simples Nacional",
+   "porte": "Empresa de Pequeno Porte (EPP)",
+   "n": 56431
+  },
+  {
+   "regime": "Normal (Presumido/Real)",
+   "porte": "Demais",
+   "n": 209600
+  },
+  {
+   "regime": "Simples Nacional",
+   "porte": "Microempresa (ME)",
+   "n": 388655
+  },
+  {
+   "regime": "Normal (Presumido/Real)",
+   "porte": "Empresa de Pequeno Porte (EPP)",
+   "n": 47811
+  },
+  {
+   "regime": "MEI",
+   "porte": "Empresa de Pequeno Porte (EPP)",
+   "n": 5
+  },
+  {
+   "regime": "MEI",
+   "porte": "Microempresa (ME)",
+   "n": 831081
+  },
+  {
+   "regime": "Normal (Presumido/Real)",
+   "porte": "Microempresa (ME)",
+   "n": 210285
+  },
+  {
+   "regime": "Simples Nacional",
+   "porte": "Demais",
+   "n": 17419
+  },
+  {
+   "regime": "MEI",
+   "porte": "Demais",
+   "n": 2
+  }
+ ],
+ "capital_buckets": [
+  {
+   "faixa": "Ate 10 mil",
+   "n": 1075707
+  },
+  {
+   "faixa": "1 mi - 10 mi",
+   "n": 27071
+  },
+  {
+   "faixa": "Acima de 10 mi",
+   "n": 22612
+  },
+  {
+   "faixa": "10 mil - 100 mil",
+   "n": 512672
+  },
+  {
+   "faixa": "100 mil - 1 mi",
+   "n": 123227
+  }
+ ],
+ "flags": {
+  "Divida Ativa Uniao (PGFN)": 386264,
+  "CEIS (inidoneas)": 613,
+  "CNEP (anticorrupcao)": 21,
+  "Setor eletrico": 461,
+  "ANVISA (AFE)": 15974,
+  "Comercio exterior (RADAR)": 38188,
+  "Beneficiaria PAT": 37962
+ },
+ "pgfn": {
+  "cnpjs_com_divida": 386264,
+  "total": 177862142867.2111,
+  "previdenciario": 31363356675.379974,
+  "nao_previdenciario": 142560016962.2206,
+  "fgts": 3938769229.610002
+ },
+ "pgfn_top": [
+  {
+   "cnpj": "88332580000165",
+   "razao_social": "ULBRA S.A.",
+   "municipio_nome": "CANOAS",
+   "divida": 6676554564.41,
+   "qtd_inscricoes_uniao": 317
+  },
+  {
+   "cnpj": "93027589000100",
+   "razao_social": "NAPE ADMINISTRACAO E PARTICIPACOES S/A",
+   "municipio_nome": "SAPUCAIA DO SUL",
+   "divida": 1251812489.44,
+   "qtd_inscricoes_uniao": 656
+  },
+  {
+   "cnpj": "93027589000100",
+   "razao_social": "NAPE ADMINISTRACAO E PARTICIPACOES S/A",
+   "municipio_nome": "SAPUCAIA DO SUL",
+   "divida": 1251812489.44,
+   "qtd_inscricoes_uniao": 656
+  },
+  {
+   "cnpj": "90726506000175",
+   "razao_social": "COTRIJUI - COOPERATIVA AGROPECUARIA & INDUSTRIAL LTDA - EM LIQUIDACAO",
+   "municipio_nome": "IJUI",
+   "divida": 1241842323.45,
+   "qtd_inscricoes_uniao": 290
+  },
+  {
+   "cnpj": "90726506000175",
+   "razao_social": "COTRIJUI - COOPERATIVA AGROPECUARIA & INDUSTRIAL LTDA - EM LIQUIDACAO",
+   "municipio_nome": "IJUI",
+   "divida": 1241842323.45,
+   "qtd_inscricoes_uniao": 290
+  },
+  {
+   "cnpj": "88648761000103",
+   "razao_social": "FUNDACAO UNIVERSIDADE DE CAXIAS DO SUL",
+   "municipio_nome": "CAXIAS DO SUL",
+   "divida": 1081429042.0,
+   "qtd_inscricoes_uniao": 21
+  },
+  {
+   "cnpj": "02016439000138",
+   "razao_social": "RIO GRANDE ENERGIA SA",
+   "municipio_nome": "CAXIAS DO SUL",
+   "divida": 999158612.94,
+   "qtd_inscricoes_uniao": 7
+  },
+  {
+   "cnpj": "02016439000138",
+   "razao_social": "RIO GRANDE ENERGIA SA",
+   "municipio_nome": "CAXIAS DO SUL",
+   "divida": 999158612.94,
+   "qtd_inscricoes_uniao": 7
+  },
+  {
+   "cnpj": "72381189000110",
+   "razao_social": "DELL COMPUTADORES DO BRASIL LTDA",
+   "municipio_nome": "ELDORADO DO SUL",
+   "divida": 959727360.88,
+   "qtd_inscricoes_uniao": 51
+  },
+  {
+   "cnpj": "01523413000113",
+   "razao_social": "DM ELETRONICA DA AMAZONIA LTDA",
+   "municipio_nome": "PORTO ALEGRE",
+   "divida": 902868229.87,
+   "qtd_inscricoes_uniao": 29
+  },
+  {
+   "cnpj": "11754525000139",
+   "razao_social": "ECOVIX CONSTRUCOES OCEANICAS S/A",
+   "municipio_nome": "RIO GRANDE",
+   "divida": 877371438.57,
+   "qtd_inscricoes_uniao": 265
+  },
+  {
+   "cnpj": "67313221000190",
+   "razao_social": "CONTAX S.A. - EM RECUPERACAO JUDICIAL EM RECUPERACAO JUDICIAL",
+   "municipio_nome": "PORTO ALEGRE",
+   "divida": 809134997.45,
+   "qtd_inscricoes_uniao": 335
+  },
+  {
+   "cnpj": "92015064000184",
+   "razao_social": "SEMEATO S A INDUSTRIA E COMERCIO - EM RECUPERACAO JUDICIAL",
+   "municipio_nome": "PASSO FUNDO",
+   "divida": 739395151.26,
+   "qtd_inscricoes_uniao": 619
+  },
+  {
+   "cnpj": "92015064000184",
+   "razao_social": "SEMEATO S A INDUSTRIA E COMERCIO - EM RECUPERACAO JUDICIAL",
+   "municipio_nome": "PASSO FUNDO",
+   "divida": 739395151.26,
+   "qtd_inscricoes_uniao": 619
+  },
+  {
+   "cnpj": "04654447000488",
+   "razao_social": "MASSA FALIDA VOGES METALURGICA LTDA",
+   "municipio_nome": "CAXIAS DO SUL",
+   "divida": 654077396.83,
+   "qtd_inscricoes_uniao": 115
+  },
+  {
+   "cnpj": "97428668000176",
+   "razao_social": "ELFE OPERACAO E MANUTENCAO S.A. - EM RECUPERACAO JUDICIAL EM RECUPERACAO JUDICIAL",
+   "municipio_nome": "PORTO ALEGRE",
+   "divida": 640954672.6,
+   "qtd_inscricoes_uniao": 304
+  },
+  {
+   "cnpj": "97428668000176",
+   "razao_social": "ELFE OPERACAO E MANUTENCAO S.A. - EM RECUPERACAO JUDICIAL EM RECUPERACAO JUDICIAL",
+   "municipio_nome": "PORTO ALEGRE",
+   "divida": 640954672.6,
+   "qtd_inscricoes_uniao": 304
+  },
+  {
+   "cnpj": "07359641000186",
+   "razao_social": "GERDAU ACOS ESPECIAIS S.A.",
+   "municipio_nome": "PORTO ALEGRE",
+   "divida": 632391593.24,
+   "qtd_inscricoes_uniao": 4
+  },
+  {
+   "cnpj": "89363642000169",
+   "razao_social": "MUNICIPIO DE ENCRUZILHADA DO SUL",
+   "municipio_nome": "ENCRUZILHADA DO SUL",
+   "divida": 610808655.16,
+   "qtd_inscricoes_uniao": 1
+  },
+  {
+   "cnpj": "89363642000169",
+   "razao_social": "MUNICIPIO DE ENCRUZILHADA DO SUL",
+   "municipio_nome": "ENCRUZILHADA DO SUL",
+   "divida": 610808655.16,
+   "qtd_inscricoes_uniao": 1
+  }
+ ]
+}
