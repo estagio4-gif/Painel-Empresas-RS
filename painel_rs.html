@@ -208,6 +208,8 @@
           <div class="fld"><label>Dívida Ativa União<span class="hint" title="Débitos federais inscritos na PGFN (IRPJ, PIS/COFINS, INSS, FGTS etc.)">ⓘ</span></label><select id="m_pgfn" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM dívida</option><option value="sem">Somente SEM dívida</option></select></div>
           <div class="fld"><label>Faixa de dívida União</label><select id="fDiv"><option value="">(qualquer)</option><option value="100000-">≥ R$ 100 mil</option><option value="1000000-">≥ R$ 1 mi</option><option value="10000000-">≥ R$ 10 mi</option><option value="100000000-">≥ R$ 100 mi</option></select></div>
           <div class="fld"><label>Comércio exterior<span class="hint" title="Habilitação no RADAR/Siscomex (importa/exporta)">ⓘ</span></label><select id="m_comex" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld" id="fldImpScore" style="display:none"><label>Potencial importadora<span class="hint" title="Score heurístico 0–100 de provável importadora (razão social, CNAE, porte etc.). Faixas: Baixa ≥15, Média ≥40, Alta ≥70.">ⓘ</span></label><select id="fImpScore"><option value="">(qualquer)</option><option value="15">≥ Baixa (15)</option><option value="40">≥ Média (40)</option><option value="70">≥ Alta (70)</option></select></div>
+          <div class="fld" id="fldExpScore" style="display:none"><label>Potencial exportadora<span class="hint" title="Score heurístico 0–100 de provável exportadora. Faixas: Baixa ≥15, Média ≥40, Alta ≥70.">ⓘ</span></label><select id="fExpScore"><option value="">(qualquer)</option><option value="15">≥ Baixa (15)</option><option value="40">≥ Média (40)</option><option value="70">≥ Alta (70)</option></select></div>
           <div class="fld"><label>ANVISA<span class="hint" title="Autorização de Funcionamento (setor saúde: farmácia, distribuidora, dispositivos)">ⓘ</span></label><select id="m_anvisa" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
           <div class="fld" id="fldAnvTipo" style="display:none"><label>Tipo de autorização ANVISA<span class="hint" title="Tipo da Autorização de Funcionamento (AFE) na ANVISA. Disponível para as empresas presentes na base de AFE.">ⓘ</span></label><select id="fAnvTipo"><option value="">(qualquer)</option><option value="Medicamento">Medicamento</option><option value="Alimento">Alimento</option><option value="Saneantes">Saneantes</option><option value="Portos, Aeroportos">Portos/Aeroportos/Fronteiras</option><option value="Gases Medicinais">Gases medicinais</option><option value="__AE__">Autorização Especial (controlados)</option></select></div>
           <div class="fld"><label>Setor elétrico<span class="hint" title="Agente da CCEE/ANEEL (geração, transmissão, distribuição, comercialização)">ⓘ</span></label><select id="m_energia" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
@@ -351,6 +353,8 @@ let sortCol='razao_social', sortDir='ASC';
 let hasEnriched=false; // vira true se o parquet tiver as colunas de Lei do Bem
 let hasPatFunc=false; // vira true se o parquet tiver o nº de trabalhadores do PAT
 let hasAnvTipo=false; // vira true se o parquet tiver o tipo de autorização da ANVISA
+let hasComexScore=false; // vira true se o parquet tiver os scores de import/export
+const comexFaixa = s => s==null?null:(s>=70?'Alta':s>=40?'Média':s>=15?'Baixa':'Indefinido');
 const COLS=[['cnpj','CNPJ'],['razao_social','Razão social'],['nome_fantasia','Fantasia'],['municipio_nome','Município'],['cnae_principal','CNAE'],['cnae_descricao','Atividade'],['regime_tributario','Regime'],['porte','Porte'],['situacao','Situação'],['capital_social','Capital'],['divida_uniao_total','Dívida União'],['qtd_socios','Sócios']];
 // Colunas visíveis na tabela (escolhidas pelo usuário). Inicia com todas.
 let visibleCols=null; // Set de chaves; definido após COLS ser finalizado
@@ -431,6 +435,13 @@ async function initDuck(){
       COLS.push(['anvisa_tipo','Autoriz. ANVISA']);
       $('#fldAnvTipo').style.display='';
     }
+    // Detecta os scores de comércio exterior (provável importadora/exportadora)
+    hasComexScore = COLSET.has('comex_imp_score') && COLSET.has('comex_exp_score');
+    if(hasComexScore){
+      COLS.push(['comex_imp_score','Score Import.'],['comex_exp_score','Score Export.']);
+      $('#fldImpScore').style.display='';
+      $('#fldExpScore').style.display='';
+    }
     // Seletor de colunas — agora que COLS está completo
     initColChooser();
     $('#expStatus').textContent='Preparando listas de filtro…';
@@ -487,6 +498,7 @@ function buildWhere(){
   range('#fDiv','divida_uniao_total',w);
   tri('#m_pgfn','flag_pgfn',w);
   tri('#m_comex','flag_comex',w);
+  if(hasComexScore){ const im=$('#fImpScore').value; if(im) w.push(`comex_imp_score>=${Number(im)}`); const ex=$('#fExpScore').value; if(ex) w.push(`comex_exp_score>=${Number(ex)}`); }
   tri('#m_anvisa','flag_anvisa',w);
   if(hasAnvTipo){ const at=$('#fAnvTipo').value; if(at==='__AE__') w.push('anvisa_ae'); else if(at) w.push(`anvisa_tipo LIKE '%${esc(at)}%'`); }
   tri('#m_pat','flag_pat',w);
@@ -536,6 +548,7 @@ async function runQuery(reset=true){
     if(c[0]==='score_lei_do_bem'){ const n=v==null?null:Number(v); return `<td>${n==null?'—':`<b style="color:${n>=60?'var(--ok)':'var(--navy)'}">${n}</b>`}</td>`; }
     if(c[0]==='pat_funcionarios'){ return `<td>${v==null?'—':fmt(v)}</td>`; }
     if(c[0]==='anvisa_tipo'){ return `<td>${v==null?'—':`<span class="badge b-info">${String(v)}</span>`}</td>`; }
+    if(c[0]==='comex_imp_score'||c[0]==='comex_exp_score'){ const n=v==null?null:Number(v); const f=comexFaixa(n); const cls=n>=70?'b-ok':(n>=40?'b-info':'b-warn'); return `<td>${n==null?'—':(n>=15?`<span class="badge ${cls}">${n} · ${f}</span>`:n)}</td>`; }
     return `<td>${v==null?'':String(v)}</td>`;
   }).join('')+'</tr>').join('') : `<tr><td colspan="${VC.length}" class="loading">Nenhum resultado para esse filtro.</td></tr>`;
   $('#expStatus').innerHTML=`<b>${fmt(lastCount)}</b> empresas encontradas para o filtro atual.`;
@@ -559,7 +572,7 @@ const FILTER_LABELS={
   fMat:'Matriz/Filial', fSoc:'Sócios', fEmail:'E-mail', fTel:'Telefone',
   fRegime:'Regime', fSit:'Situação', fPorte:'Porte', fCap:'Capital',
   fAno:'Abertura desde', fMun:'Município', fDiv:'Faixa dívida',
-  m_pgfn:'Dívida União', m_comex:'Comex', m_anvisa:'ANVISA', fAnvTipo:'Tipo ANVISA', m_pat:'PAT',
+  m_pgfn:'Dívida União', m_comex:'Comex', fImpScore:'Pot. importadora', fExpScore:'Pot. exportadora', m_anvisa:'ANVISA', fAnvTipo:'Tipo ANVISA', m_pat:'PAT',
   fPatFunc:'Funcionários PAT', fPatAte5:'Trab. até 5 SM',
   m_energia:'Energia', m_ceis:'CEIS', m_cnep:'CNEP',
   fPD:'Intensidade P&D', fLB:'Potencial Lei do Bem',
@@ -745,6 +758,16 @@ async function openDrawer(cnpj, tr){
         ${row('Dívida total (CNPJ)', fmtBrl(r.divida_uniao_total))}
         ${row('Inscrições', r.qtd_inscricoes_uniao)}
         ${row('Dívida grupo econômico', fmtBrl(r.divida_uniao_grupo))}
+      </div>
+    </div>` : ''}
+
+    ${(Number(r.comex_imp_score)>=15 || Number(r.comex_exp_score)>=15) ? `<div class="drw-sec">
+      <div class="drw-sec-ttl s3">Comércio exterior — potencial (heurística)</div>
+      <div class="drw-rows">
+        ${row('Score importadora', r.comex_imp_score==null?null:`<b>${r.comex_imp_score}</b> · ${comexFaixa(Number(r.comex_imp_score))}`)}
+        ${row('Sinais (import.)', r.comex_imp_sinais, true)}
+        ${row('Score exportadora', r.comex_exp_score==null?null:`<b>${r.comex_exp_score}</b> · ${comexFaixa(Number(r.comex_exp_score))}`)}
+        ${row('Sinais (export.)', r.comex_exp_sinais, true)}
       </div>
     </div>` : ''}
 
