@@ -7,4 +7,4 @@ echo   PAINEL TRIBUTARIO - EMPRESAS DO RS
 echo   Iniciando servidor local... (NAO feche esta janela)
 echo ============================================================
 start "" http://localhost:8777/painel_rs.html
-python -m http.server 8777
+python servidor.py 8777

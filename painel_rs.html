@@ -48,6 +48,13 @@
   .b-ok{background:#e8f5e9;color:var(--ok)} .b-warn{background:#fdecea;color:var(--warn)} .b-info{background:#eef2f7;color:var(--navy)}
   .tablewrap{background:var(--card);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);max-height:60vh;overflow:auto}
   .loading{padding:40px;text-align:center;color:var(--muted)}
+  .colpick{margin:6px 2px 10px;position:relative}
+  .colsbox{margin-top:8px;padding:12px 14px;background:var(--card);border:1px solid #e3e3e3;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+  .colsbox .colstools{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .colsbox .colgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 16px}
+  .colsbox label{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;padding:3px 4px;border-radius:6px}
+  .colsbox label:hover{background:#f4f4f4}
+  .colsbox input{accent-color:var(--gold);width:15px;height:15px;cursor:pointer}
   .pager{display:flex;gap:8px;align-items:center;margin:12px 2px;font-size:13px}
   .note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
   .fhelp{font-size:12.5px;color:var(--muted);margin:0 0 12px;line-height:1.5}
@@ -202,10 +209,20 @@
           <div class="fld"><label>Faixa de dívida União</label><select id="fDiv"><option value="">(qualquer)</option><option value="100000-">≥ R$ 100 mil</option><option value="1000000-">≥ R$ 1 mi</option><option value="10000000-">≥ R$ 10 mi</option><option value="100000000-">≥ R$ 100 mi</option></select></div>
           <div class="fld"><label>Comércio exterior<span class="hint" title="Habilitação no RADAR/Siscomex (importa/exporta)">ⓘ</span></label><select id="m_comex" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
           <div class="fld"><label>ANVISA<span class="hint" title="Autorização de Funcionamento (setor saúde: farmácia, distribuidora, dispositivos)">ⓘ</span></label><select id="m_anvisa" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
-          <div class="fld"><label>PAT<span class="hint" title="Beneficiária do Programa de Alimentação do Trabalhador (benefício de IRPJ)">ⓘ</span></label><select id="m_pat" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld" id="fldAnvTipo" style="display:none"><label>Tipo de autorização ANVISA<span class="hint" title="Tipo da Autorização de Funcionamento (AFE) na ANVISA. Disponível para as empresas presentes na base de AFE.">ⓘ</span></label><select id="fAnvTipo"><option value="">(qualquer)</option><option value="Medicamento">Medicamento</option><option value="Alimento">Alimento</option><option value="Saneantes">Saneantes</option><option value="Portos, Aeroportos">Portos/Aeroportos/Fronteiras</option><option value="Gases Medicinais">Gases medicinais</option><option value="__AE__">Autorização Especial (controlados)</option></select></div>
           <div class="fld"><label>Setor elétrico<span class="hint" title="Agente da CCEE/ANEEL (geração, transmissão, distribuição, comercialização)">ⓘ</span></label><select id="m_energia" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
           <div class="fld"><label>CEIS<span class="hint" title="Empresas inidôneas/suspensas de licitar (Portal da Transparência)">ⓘ</span></label><select id="m_ceis" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
           <div class="fld"><label>CNEP<span class="hint" title="Punidas pela Lei Anticorrupção">ⓘ</span></label><select id="m_cnep" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+        </div>
+      </div>
+
+      <div class="fgroup" id="patGroup">
+        <div class="fgtitle">PAT — Programa de Alimentação do Trabalhador</div>
+        <p class="fhelp">Cruzamento com a lista de <b>beneficiárias do PAT</b> (Ministério do Trabalho, base de 31/03/2026). O <b>nº de trabalhadores</b> é o declarado no registro do PAT e existe apenas para quem está na base (situação Ativo). A divisão por salário importa para o benefício de IRPJ, que incide sobre os trabalhadores que ganham <b>até 5 salários mínimos</b>.</p>
+        <div class="row">
+          <div class="fld"><label>Beneficiária do PAT<span class="hint" title="Está na lista de beneficiárias do Programa de Alimentação do Trabalhador (benefício de IRPJ)">ⓘ</span></label><select id="m_pat" class="tri"><option value="">(indiferente)</option><option value="com">Somente COM</option><option value="sem">Somente SEM</option></select></div>
+          <div class="fld" id="fldPatFunc" style="display:none"><label>Nº de funcionários (PAT)<span class="hint" title="Total de trabalhadores declarado no registro do PAT. Selecionar uma faixa já restringe às beneficiárias do PAT.">ⓘ</span></label><select id="fPatFunc"><option value="">(qualquer)</option><option value="1-10">1 a 9</option><option value="10-50">10 a 49</option><option value="50-100">50 a 99</option><option value="100-500">100 a 499</option><option value="500-1000">500 a 999</option><option value="1000-">1.000 ou mais</option></select></div>
+          <div class="fld" id="fldPatAte5" style="display:none"><label>Trabalhadores até 5 SM<span class="hint" title="Trabalhadores que ganham até 5 salários mínimos — faixa que gera o benefício de IRPJ do PAT.">ⓘ</span></label><select id="fPatAte5"><option value="">(qualquer)</option><option value="1-">1 ou mais</option><option value="10-">10 ou mais</option><option value="50-">50 ou mais</option><option value="100-">100 ou mais</option><option value="500-">500 ou mais</option></select></div>
         </div>
       </div>
 
@@ -232,6 +249,10 @@
       <div id="activeFilters"></div>
     </div>
     <div class="status" id="expStatus">Carregando motor de consulta…</div>
+    <div class="colpick">
+      <button class="btn ghost" id="btnCols" type="button">▦ Escolher colunas ▾</button>
+      <div id="colsBox" class="colsbox" style="display:none"></div>
+    </div>
     <div class="tablewrap"><table id="tExp"><thead></thead><tbody><tr><td class="loading">Aguardando…</td></tr></tbody></table></div>
     <div class="pager">
       <button class="btn ghost" id="prev">‹ Anterior</button>
@@ -253,7 +274,7 @@
         <tr><td>CCEE / ANEEL</td><td>Agentes do setor elétrico</td><td>Mensal</td><td><a href="https://dadosabertos.aneel.gov.br/dataset" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
         <tr><td>ANVISA — AFE</td><td>Autorização de funcionamento (saúde)</td><td>Periódica</td><td><a href="https://www.gov.br/anvisa/pt-br/acessoainformacao/dadosabertos" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
         <tr><td>Siscomex / RADAR (Cadint)</td><td>Habilitação a comércio exterior</td><td>Periódica</td><td><a href="https://www.gov.br/siscomex/pt-br" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
-        <tr><td>PAT — Min. do Trabalho</td><td>Beneficiárias do Programa de Alimentação do Trabalhador</td><td>Periódica</td><td><a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/empregador/programa-de-alimentacao-do-trabalhador-pat" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
+        <tr><td>PAT — Min. do Trabalho</td><td>Beneficiárias do Programa de Alimentação do Trabalhador, com nº de trabalhadores e divisão por faixa salarial (até / acima de 5 SM)</td><td>Periódica (base 31/03/2026)</td><td><a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/empregador/programa-de-alimentacao-do-trabalhador-pat" target="_blank" rel="noopener">Baixar ↗</a></td></tr>
       </table>
       <div class="note" style="margin-top:14px">
         <b>Observações tributárias.</b> O regime "Normal (Presumido/Real)" é inferido por exclusão (empresas que <i>não</i> são MEI nem optantes do Simples) — a Receita não publica a opção entre Lucro Presumido e Lucro Real. A base abrange todos os estabelecimentos com UF = RS, incluindo baixados (use o filtro de situação). Capital social é o valor declarado, não o faturamento.
@@ -328,7 +349,12 @@ loadOverview();
 let conn=null, PAGE=0, PERPAGE=100, lastCount=0, lastWhere='1=1';
 let sortCol='razao_social', sortDir='ASC';
 let hasEnriched=false; // vira true se o parquet tiver as colunas de Lei do Bem
+let hasPatFunc=false; // vira true se o parquet tiver o nº de trabalhadores do PAT
+let hasAnvTipo=false; // vira true se o parquet tiver o tipo de autorização da ANVISA
 const COLS=[['cnpj','CNPJ'],['razao_social','Razão social'],['nome_fantasia','Fantasia'],['municipio_nome','Município'],['cnae_principal','CNAE'],['cnae_descricao','Atividade'],['regime_tributario','Regime'],['porte','Porte'],['situacao','Situação'],['capital_social','Capital'],['divida_uniao_total','Dívida União'],['qtd_socios','Sócios']];
+// Colunas visíveis na tabela (escolhidas pelo usuário). Inicia com todas.
+let visibleCols=null; // Set de chaves; definido após COLS ser finalizado
+const shownCols=()=>COLS.filter(c=>!visibleCols||visibleCols.has(c[0]));
 
 // Lei do Bem — CNAEs intensivos em P&D (ver cnae_pd_intensivo.csv / OCDE-Eurostat)
 const PD_ALTA_DIV=['20','21','26','27','28','29','30','62','72'];
@@ -348,9 +374,41 @@ async function initDuck(){
     const worker = await duckdb.createWorker(b.mainWorker);
     const db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
     await db.instantiate(b.mainModule, b.pthreadWorker);
-    await db.registerFileURL('explorer.parquet', new URL('explorer.parquet', location.href).href, duckdb.DuckDBDataProtocol.HTTP, false);
-    conn = await db.connect();
-    await conn.query("CREATE VIEW emp AS SELECT * FROM read_parquet('explorer.parquet')");
+    // Detecta modo enriquecido (parts/) ou modo base (explorer.parquet)
+    let usePartsMode = false;
+    try {
+      const testUrl = new URL('parts/part_000.parquet', location.href).href;
+      const r = await fetch(testUrl, {method:'HEAD'});
+      usePartsMode = r.ok;
+    } catch(e) { /* ignora — cai no modo base */ }
+
+    // Baixa cada parquet INTEIRO e carrega na memória (registerFileBuffer), em vez
+    // de ler por faixas de bytes (registerFileURL/HTTP). Isso funciona em qualquer
+    // servidor local — inclusive os que não suportam requisições "Range" — e ignora
+    // respostas antigas no cache do navegador (cache:'reload').
+    const fetchBuf = async (url) => {
+      const resp = await fetch(url, {cache:'reload'});
+      if(!resp.ok) throw new Error('HTTP '+resp.status+' ao baixar '+url);
+      return new Uint8Array(await resp.arrayBuffer());
+    };
+    if(usePartsMode) {
+      const partNames = [];
+      for(let i=0;i<=8;i++){
+        const fname = `part_${String(i).padStart(3,'0')}.parquet`;
+        $('#expStatus').textContent=`Baixando dados… (${i+1}/9)`;
+        const buf = await fetchBuf(new URL(`parts/${fname}`, location.href).href);
+        await db.registerFileBuffer(fname, buf);
+        partNames.push(`'${fname}'`);
+      }
+      conn = await db.connect();
+      await conn.query(`CREATE VIEW emp AS SELECT * FROM read_parquet([${partNames.join(',')}])`);
+    } else {
+      $('#expStatus').textContent='Baixando dados…';
+      const buf = await fetchBuf(new URL('explorer.parquet', location.href).href);
+      await db.registerFileBuffer('explorer.parquet', buf);
+      conn = await db.connect();
+      await conn.query("CREATE VIEW emp AS SELECT * FROM read_parquet('explorer.parquet')");
+    }
     // Detecta se a base foi enriquecida (montar_flags_leidobem.py) e ativa os filtros extras
     const info = await conn.query("PRAGMA table_info('emp')");
     const COLSET = new Set(info.toArray().map(r=>r.name));
@@ -360,6 +418,21 @@ async function initDuck(){
       $('#enrichedFilters').style.display='';
       $('#enrichedHint').style.display='';
     }
+    // Detecta se a base traz o nº de trabalhadores do PAT e ativa os filtros/coluna
+    hasPatFunc = COLSET.has('pat_funcionarios');
+    if(hasPatFunc){
+      COLS.push(['pat_funcionarios','Funcion. PAT']);
+      $('#fldPatFunc').style.display='';
+      $('#fldPatAte5').style.display='';
+    }
+    // Detecta se a base traz o tipo de autorização da ANVISA e ativa o filtro/coluna
+    hasAnvTipo = COLSET.has('anvisa_tipo');
+    if(hasAnvTipo){
+      COLS.push(['anvisa_tipo','Autoriz. ANVISA']);
+      $('#fldAnvTipo').style.display='';
+    }
+    // Seletor de colunas — agora que COLS está completo
+    initColChooser();
     $('#expStatus').textContent='Preparando listas de filtro…';
     const addOpts=(selId, rows, valKey, txtFn)=>{ const sel=$(selId); for(const r of rows){ const o=document.createElement('option'); o.value=r[valKey]; o.textContent=txtFn(r); sel.appendChild(o);} };
     // Municípios (por nº de empresas)
@@ -415,7 +488,9 @@ function buildWhere(){
   tri('#m_pgfn','flag_pgfn',w);
   tri('#m_comex','flag_comex',w);
   tri('#m_anvisa','flag_anvisa',w);
+  if(hasAnvTipo){ const at=$('#fAnvTipo').value; if(at==='__AE__') w.push('anvisa_ae'); else if(at) w.push(`anvisa_tipo LIKE '%${esc(at)}%'`); }
   tri('#m_pat','flag_pat',w);
+  if(hasPatFunc){ range('#fPatFunc','pat_funcionarios',w); range('#fPatAte5','pat_func_ate5sm',w); }
   tri('#m_energia','flag_energia',w);
   tri('#m_ceis','flag_ceis',w);
   tri('#m_cnep','flag_cnep',w);
@@ -444,22 +519,25 @@ async function runQuery(reset=true){
   $('#expStatus').textContent='Consultando…';
   const c = await conn.query(`SELECT count(*) n FROM emp WHERE ${lastWhere}`);
   lastCount = Number(c.toArray()[0].n);
-  const cols = COLS.map(c=>c[0]).join(',');
+  const VC = shownCols();
+  const cols = [...new Set([...VC.map(c=>c[0]), 'cnpj'])].join(',');
   const r = await conn.query(`SELECT ${cols} FROM emp WHERE ${lastWhere} ORDER BY ${sortCol} ${sortDir} LIMIT ${PERPAGE} OFFSET ${PAGE*PERPAGE}`);
   const rows = r.toArray();
-  $('#tExp thead').innerHTML='<tr>'+COLS.map(c=>{
+  $('#tExp thead').innerHTML='<tr>'+VC.map(c=>{
     const ind = sortCol===c[0] ? (sortDir==='ASC'?' ▲':' ▼') : ' ⇅';
     return `<th data-col="${c[0]}" style="cursor:pointer;user-select:none">${c[1]}${ind}</th>`;
   }).join('')+'</tr>';
-  $('#tExp tbody').innerHTML = rows.length? rows.map(row=>`<tr data-cnpj="${row['cnpj']||''}">`+COLS.map(c=>{
+  $('#tExp tbody').innerHTML = rows.length? rows.map(row=>`<tr data-cnpj="${row['cnpj']||''}">`+VC.map(c=>{
     let v=row[c[0]];
     if(c[0]==='capital_social') v = v==null?'':'R$ '+fmt(Math.round(v));
     if(c[0]==='divida_uniao_total'){ const n=Number(v)||0; return `<td>${n>0?'<span class="badge b-warn">R$ '+fmt(Math.round(n))+'</span>':'—'}</td>`; }
     if(c[0]==='situacao'){ const cls = v==='Ativa'?'b-ok':(v==='Baixada'?'b-warn':'b-info'); return `<td><span class="badge ${cls}">${v||''}</span></td>`; }
     if(c[0]==='pd_nivel'){ return `<td>${v?`<span class="badge b-info">${v}</span>`:'—'}</td>`; }
     if(c[0]==='score_lei_do_bem'){ const n=v==null?null:Number(v); return `<td>${n==null?'—':`<b style="color:${n>=60?'var(--ok)':'var(--navy)'}">${n}</b>`}</td>`; }
+    if(c[0]==='pat_funcionarios'){ return `<td>${v==null?'—':fmt(v)}</td>`; }
+    if(c[0]==='anvisa_tipo'){ return `<td>${v==null?'—':`<span class="badge b-info">${String(v)}</span>`}</td>`; }
     return `<td>${v==null?'':String(v)}</td>`;
-  }).join('')+'</tr>').join('') : `<tr><td colspan="${COLS.length}" class="loading">Nenhum resultado para esse filtro.</td></tr>`;
+  }).join('')+'</tr>').join('') : `<tr><td colspan="${VC.length}" class="loading">Nenhum resultado para esse filtro.</td></tr>`;
   $('#expStatus').innerHTML=`<b>${fmt(lastCount)}</b> empresas encontradas para o filtro atual.`;
   const pages=Math.max(1,Math.ceil(lastCount/PERPAGE));
   $('#pageInfo').textContent=`Página ${PAGE+1} de ${fmt(pages)}`;
@@ -481,7 +559,8 @@ const FILTER_LABELS={
   fMat:'Matriz/Filial', fSoc:'Sócios', fEmail:'E-mail', fTel:'Telefone',
   fRegime:'Regime', fSit:'Situação', fPorte:'Porte', fCap:'Capital',
   fAno:'Abertura desde', fMun:'Município', fDiv:'Faixa dívida',
-  m_pgfn:'Dívida União', m_comex:'Comex', m_anvisa:'ANVISA', m_pat:'PAT',
+  m_pgfn:'Dívida União', m_comex:'Comex', m_anvisa:'ANVISA', fAnvTipo:'Tipo ANVISA', m_pat:'PAT',
+  fPatFunc:'Funcionários PAT', fPatAte5:'Trab. até 5 SM',
   m_energia:'Energia', m_ceis:'CEIS', m_cnep:'CNEP',
   fPD:'Intensidade P&D', fLB:'Potencial Lei do Bem',
   fJaUsa:'Já usa Lei do Bem', fInova:'Sinal de inovação', fScore:'Score mínimo'
@@ -513,15 +592,46 @@ $('#prev').onclick=()=>{if(PAGE>0){PAGE--;runQuery(false);}};
 $('#next').onclick=()=>{if((PAGE+1)*PERPAGE<lastCount){PAGE++;runQuery(false);}};
 $('#btnCsv').onclick=async()=>{
   if(!conn)return; $('#expStatus').textContent='Gerando CSV…';
-  const cols=COLS.map(c=>c[0]).join(',');
+  const VC=shownCols();
+  const cols=VC.map(c=>c[0]).join(',');
   const r=await conn.query(`SELECT ${cols} FROM emp WHERE ${lastWhere} ORDER BY situacao, razao_social LIMIT 100000`);
   const rows=r.toArray();
-  const head=COLS.map(c=>c[1]).join(';');
-  const body=rows.map(row=>COLS.map(c=>{let v=row[c[0]];return v==null?'':('"'+String(v).replace(/"/g,'""')+'"');}).join(';')).join('\n');
+  const head=VC.map(c=>c[1]).join(';');
+  const body=rows.map(row=>VC.map(c=>{let v=row[c[0]];return v==null?'':('"'+String(v).replace(/"/g,'""')+'"');}).join(';')).join('\n');
   const blob=new Blob(['﻿'+head+'\n'+body],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='empresas_rs_filtrado.csv';a.click();
   $('#expStatus').innerHTML=`<b>${fmt(lastCount)}</b> empresas — CSV exportado (até 100 mil linhas).`;
 };
+// ── Seletor de colunas da tabela ───────────────────────────────
+function saveCols(){ try{ localStorage.setItem('painel_cols', JSON.stringify([...visibleCols])); }catch(e){} }
+function initColChooser(){
+  visibleCols = new Set(COLS.map(c=>c[0]));
+  try{
+    const saved=JSON.parse(localStorage.getItem('painel_cols')||'null');
+    if(Array.isArray(saved)){ const valid=saved.filter(k=>COLS.some(c=>c[0]===k)); if(valid.length) visibleCols=new Set(valid); }
+  }catch(e){}
+  renderColChooser();
+  $('#btnCols').onclick=()=>{ const b=$('#colsBox'); b.style.display = b.style.display==='none'?'':'none'; };
+}
+function renderColChooser(){
+  const box=$('#colsBox');
+  box.innerHTML =
+    '<div class="colstools">'
+    + '<button class="btn ghost" id="colAll" type="button">Marcar todas</button>'
+    + '<button class="btn ghost" id="colNone" type="button">Só o essencial</button>'
+    + '</div><div class="colgrid">'
+    + COLS.map(c=>`<label><input type="checkbox" data-col="${c[0]}" ${visibleCols.has(c[0])?'checked':''}> ${c[1]}</label>`).join('')
+    + '</div>';
+  box.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.addEventListener('change',()=>{
+    const k=cb.dataset.col;
+    if(cb.checked) visibleCols.add(k); else visibleCols.delete(k);
+    if(visibleCols.size===0){ visibleCols.add(k); cb.checked=true; return; } // mantém ao menos 1 coluna
+    saveCols(); runQuery(false);
+  }));
+  $('#colAll').onclick=()=>{ visibleCols=new Set(COLS.map(c=>c[0])); renderColChooser(); saveCols(); runQuery(false); };
+  $('#colNone').onclick=()=>{ visibleCols=new Set(['cnpj','razao_social','municipio_nome']); renderColChooser(); saveCols(); runQuery(false); };
+}
+
 initDuck();
 
 // ---------- TABS ----------
@@ -635,6 +745,24 @@ async function openDrawer(cnpj, tr){
         ${row('Dívida total (CNPJ)', fmtBrl(r.divida_uniao_total))}
         ${row('Inscrições', r.qtd_inscricoes_uniao)}
         ${row('Dívida grupo econômico', fmtBrl(r.divida_uniao_grupo))}
+      </div>
+    </div>` : ''}
+
+    ${bool(r.flag_anvisa) ? `<div class="drw-sec">
+      <div class="drw-sec-ttl s2">ANVISA</div>
+      <div class="drw-rows">
+        ${row('Tipo de autorização (AFE)', r.anvisa_tipo || '<i style="color:var(--muted)">não detalhado nesta base</i>', true)}
+        ${row('Autorização Especial (controlados)', r.anvisa_ae==null?null:(bool(r.anvisa_ae)?'Sim':'Não'))}
+        ${row('AFE ativa', r.anvisa_afe_ativa==null?null:(bool(r.anvisa_afe_ativa)?'Sim':'Não'))}
+      </div>
+    </div>` : ''}
+
+    ${bool(r.flag_pat) ? `<div class="drw-sec">
+      <div class="drw-sec-ttl s2">PAT — Programa de Alimentação do Trabalhador</div>
+      <div class="drw-rows">
+        ${row('Total de trabalhadores', r.pat_funcionarios==null?null:fmt(r.pat_funcionarios))}
+        ${row('Trabalhadores até 5 SM', r.pat_func_ate5sm==null?null:fmt(r.pat_func_ate5sm))}
+        ${row('Trabalhadores acima de 5 SM', r.pat_func_acima5sm==null?null:fmt(r.pat_func_acima5sm))}
       </div>
     </div>` : ''}
 
